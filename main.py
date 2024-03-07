@@ -143,14 +143,14 @@ def getUser(fullname=None):
 # ----------------- USEF DEF -----------------
 def numOfAssets():
 
-
     category_counts = db.session.query(
         Stock.category, db.func.count(Stock.id).label('count')
     ) \
     .group_by(Stock.category).all()
 
-    for category, count in category_counts:
-        print(f"Category: {category}, Count: {count}")
+    if category_counts:
+        for category, count in category_counts:
+            print(f"Category: {category}, Count: {count}")
 
 def unallocated_stocks():
     unallocated_stocks = db.session.query(Stock) \
@@ -158,10 +158,10 @@ def unallocated_stocks():
     .filter(Asset.id == None) \
     .all()
 
-    for stock in unallocated_stocks:
-        print(f"Unallocated Stock: {stock.name} (Category: {stock.category}), (Asset Tag: {stock.asset_tag})")
+    if unallocated_stocks:
 
-
+        for stock in unallocated_stocks:
+            print(f"Unallocated Stock: {stock.name} (Category: {stock.category}), (Asset Tag: {stock.asset_tag})")
 
       
 @app.route("/view", methods=['GET'])
@@ -265,7 +265,6 @@ def logout():
 def load_user(user_id):
 
     return User.query.get(int(user_id))
-
 
 
 if __name__ == '__main__':
