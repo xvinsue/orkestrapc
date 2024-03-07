@@ -1,20 +1,18 @@
-
-
 *{
     margin: 0;
     padding: 0;
     font-family: "Montserrat", sans-serif;
+    box-sizing: border-box;
 }
-
-.header{
-    min-height: 100vh;
-    width: 100%;
+body{
     background-image: url(assets/home.png);
     background-position: center;   
     background-size: cover;
     position: relative;
+    min-height: 100vh;
+    width: 100%;
 }
-
+/* NAVBAR INDEX */
 nav{
     display: flex;
     padding: 1%;
@@ -39,6 +37,8 @@ nav img{
     color: #fff;
     text-decoration: none;
     font-size: 18px;
+    border: 1px solid white;
+    padding: 10px 24px;
 }
 .nav-links ul li::after{
     content: '';
@@ -52,7 +52,7 @@ nav img{
 .nav-links ul li:hover:after{
     width: 100%;
 }
-
+/* HERO INDEX */
 .text-box{
     width: 90%;
     color: #fff;
@@ -91,3 +91,5 @@ nav img{
     color: #fff;
     letter-spacing: 0.5em;
 }
+
+/* LOGIN.HTML */

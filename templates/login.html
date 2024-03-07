@@ -12,13 +12,9 @@
     <section class="header">
         <nav>
          <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
-         <div class="nav-links">
-             <ul>
-                 <li><a href="#">Login</a></li>
-             </ul>
-         </div>
         </nav>
-        <div class="login-box">
+        <div class="login-box-content">
+            <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
             <form method="POST" action="{{ url_for('index') }}">
                 {{ form.csrf_token }}
                 {{ form.username.label }}
@@ -27,10 +23,10 @@
                 {{ form.password(size=20) }}
                 <button type="submit" value="Add" class="btn btn-primary">Submit</button>
             </form>
-        
+            
             {% if error != "" %}
             <p> {{ error }} </p>
             {% endif %}
-        </div>
+            </div>
      </section>
 </body>
