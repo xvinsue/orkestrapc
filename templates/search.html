@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orkestra Inventory System</title>
+</head>
+<body>
+
+    <form method="POST" action="{{ url_for('search') }}">
+        <label for="fname">Full Name:</label><br>
+        <input type="text" id="fname" name="fname"><br>
+        <input type="submit" value="Submit">
+    </form> 
+
+
+    {% if match %}
+    <h1>List of Employees</h1>
+    <p>Employees that match with the provided search term</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Employee Name</th>
+                <th>Role</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for employee in match %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('getUser', fullname=employee['full_name']) }}">
+                        {{ employee['full_name'] }}
+                    </a>
+                </td>
+                <td>{{ employee['role'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% elif error %}
+
+    <p>{{ error }}</p>
+
+    {% endif %}
+
+
+
+</body>
+</html>

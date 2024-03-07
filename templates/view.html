@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orkestra Inventory System</title>
+</head>
+
+<style>
+    table, th, td {
+  border: 1px solid black;
+}
+</style>
+<body>
+    <h1>Orkestra Inventory System</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Employee Name</th>
+                <th>Asset Name</th>
+                <th>Category</th>
+                <th>Asset Tag</th>
+                <th>Serial Number</th>
+                <th>Replacement No</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emp_name, asset_list in emp_details.items() %}
+            <tr>
+                <td rowspan="{{ asset_list|length }}">{{ emp_name }}</td>
+                {% for asset in asset_list %}
+                <td>{{ asset['name'] }}</td>
+                <td>{{ asset['category'] }}</td>
+                <td>{{ asset['asset_tag'] }}</td>
+                <td>{{ asset['serial_number'] }}</td>
+                <td>{{ asset['replacement_no'] }}</td>
+                </tr>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if error %}
+
+    <p>{{ error }}</p>
+
+    {% endif %}
+</body>
+</html>
