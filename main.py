@@ -85,8 +85,13 @@ def get_employee_details(search_name=None):
         # Fetch all employees if no search term is provided
         emp_details = db.session.query(Employee).all()
 
-    # Convert to list of dictionaries with just full names
-    full_names = [{'full_name': emp.full_name, 'role': emp.role} for emp in emp_details]
+
+    if len(emp_details) == 0:
+        full_names = "No employees details found"
+
+    else:
+        # Convert to list of dictionaries with just full names
+        full_names = [{'full_name': emp.full_name, 'role': emp.role} for emp in emp_details]
 
     return full_names
 
@@ -244,7 +249,7 @@ def index():
 
         else:
 
-            return render_template("login.html", form=form, error="There seems to be an error.")
+            return render_template("login.html", form=form, error="Wrong username or password.")
 
     return render_template("login.html", form=form)
 
