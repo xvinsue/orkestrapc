@@ -223,7 +223,7 @@ def hash_sha256(data):
     return sha256.hexdigest()
 
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/login", methods=['GET', 'POST'])
 def index():
 
     form = LoginForm()
@@ -248,7 +248,9 @@ def index():
 
     return render_template("login.html", form=form)
 
-
+@app.route("/")
+def home():
+    return render_template("index.html")
 
 @app.route("/logout")
 def logout():
