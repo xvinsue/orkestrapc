@@ -93,3 +93,86 @@ nav img{
 }
 
 /* LOGIN.HTML */
+.wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 100vh;
+}
+.wrapper form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    padding: 60px 20px 30px 20px;
+    height: 400px;
+    width: 350px;
+    background-color: rgba(39, 35, 33, 0.5);
+    margin-top: 100px;
+    border: 1px solid white;
+    border-radius: 10px;
+    -webkit-backdrop-filter: blur(15);
+    backdrop-filter: blur(3px);
+}
+form a img{
+    width: 300px;
+    padding: 0 0 20px 0;
+}
+form hr{
+    width: 250px;
+}
+form h1{
+    padding: 10px 0 10px 0;
+    color: white;
+    font-size: 20px;
+}
+.username-box{
+    width: 250px;
+    height: 30px;
+    font-size: 15px;
+    border: 1px solid white;
+    border-radius: 10px;
+    padding: 5px 20px 5px 20px;
+    background: rgba(224, 223, 223, 0.5);
+    margin-bottom: 10px;
+    box-shadow: 0px 2px 2px #2E2E2E;
+}
+.password-box{
+    width: 250px;
+    height: 30px;
+    font-size: 15px;
+    border: 1px solid white;
+    border-radius: 10px;
+    padding: 5px 20px 5px 20px;
+    background: rgba(224, 223, 223, 0.5);
+    margin-bottom: 10px;
+    box-shadow: 0px 2px 2px #2E2E2E;
+}
+.input-submit{
+    width: 250px;
+    height: 30px;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    border: 1px solid white;
+    border-radius: 10px;
+    padding: 5px 20px 5px 20px;
+    background: #2E2E2E;
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: 0.4s;
+    margin-bottom: 20px;
+}
+.input-submit:hover{
+    background: #F6921E;
+    color: #2E2E2E;
+}
+.support{
+    font-size: 13px;
+    font: 500;
+    margin-top: 40px;
+}
+.support a{
+    text-decoration: none;
+    color: white;
+}
