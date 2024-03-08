@@ -16,22 +16,19 @@
 </head>
 
 <body>
-    <section class="header">
-       <nav>
-        <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
-        <div class="nav-links">
-            <ul>
-                <li><a href="#">Login</a></li>
-            </ul>
+    <section>
+        <nav>
+            <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
+            <div class="nav-links">
+                <ul>
+                    <li><a href="{{ url_for('index') }}">Login</a></li>
+                </ul>   
+            </div>
+        </nav>
+        <div class="text-box">
+            <h1>Harmony through Technology</h1>
+            <p>Welcome to Orkestra Inventory System!</p>
+            <a href="{{ url_for('index') }}" class="hero-btn">Login</a>
         </div>
-       </nav>
-       <div class="text-box">
-        <h1>Harmony through Technology</h1>
-        <p>Welcome to Orkestra Inventory System!</p>
-        <a href="{{ url_for('index') }}" class="hero-btn">Login</a>
-       </div>
     </section>
- 
-    
-
 </body>

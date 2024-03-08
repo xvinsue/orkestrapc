@@ -2,17 +2,17 @@
     margin: 0;
     padding: 0;
     font-family: "Montserrat", sans-serif;
+    box-sizing: border-box;
 }
-
-.header{
-    min-height: 100vh;
-    width: 100%;
+body{
     background-image: url(assets/home.png);
     background-position: center;   
     background-size: cover;
     position: relative;
+    min-height: 100vh;
+    width: 100%;
 }
-
+/* NAVBAR INDEX */
 nav{
     display: flex;
     padding: 1%;
@@ -37,6 +37,8 @@ nav img{
     color: #fff;
     text-decoration: none;
     font-size: 18px;
+    border: 1px solid white;
+    padding: 10px 24px;
 }
 .nav-links ul li::after{
     content: '';
@@ -50,7 +52,7 @@ nav img{
 .nav-links ul li:hover:after{
     width: 100%;
 }
-
+/* HERO INDEX */
 .text-box{
     width: 90%;
     color: #fff;
@@ -88,4 +90,89 @@ nav img{
     background: #F6921E;
     color: #fff;
     letter-spacing: 0.5em;
+}
+
+/* LOGIN.HTML */
+.wrapper{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 100vh;
+}
+.wrapper form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    padding: 60px 20px 30px 20px;
+    height: 400px;
+    width: 350px;
+    background-color: rgba(39, 35, 33, 0.5);
+    margin-top: 100px;
+    border: 1px solid white;
+    border-radius: 10px;
+    -webkit-backdrop-filter: blur(15);
+    backdrop-filter: blur(3px);
+}
+form a img{
+    width: 300px;
+    padding: 0 0 20px 0;
+}
+form hr{
+    width: 250px;
+}
+form h1{
+    padding: 10px 0 10px 0;
+    color: white;
+    font-size: 20px;
+}
+.username-box{
+    width: 250px;
+    height: 30px;
+    font-size: 15px;
+    border: 1px solid white;
+    border-radius: 10px;
+    padding: 5px 20px 5px 20px;
+    background: rgba(224, 223, 223, 0.5);
+    margin-bottom: 10px;
+    box-shadow: 0px 2px 2px #2E2E2E;
+}
+.password-box{
+    width: 250px;
+    height: 30px;
+    font-size: 15px;
+    border: 1px solid white;
+    border-radius: 10px;
+    padding: 5px 20px 5px 20px;
+    background: rgba(224, 223, 223, 0.5);
+    margin-bottom: 10px;
+    box-shadow: 0px 2px 2px #2E2E2E;
+}
+.input-submit{
+    width: 250px;
+    height: 30px;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    border: 1px solid white;
+    border-radius: 10px;
+    padding: 5px 20px 5px 20px;
+    background: #2E2E2E;
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: 0.4s;
+    margin-bottom: 20px;
+}
+.input-submit:hover{
+    background: #F6921E;
+    color: #2E2E2E;
+}
+.support{
+    font-size: 13px;
+    font: 500;
+    margin-top: 40px;
+}
+.support a{
+    text-decoration: none;
+    color: white;
 }

@@ -6,31 +6,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orkestra Inventory System</title>
     <link rel="stylesheet" href="static\css\styles.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 
 <body>
     <section class="header">
         <nav>
          <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
-         <div class="nav-links">
-             <ul>
-                 <li><a href="#">Login</a></li>
-             </ul>
-         </div>
         </nav>
-        <div class="login-box">
-            <form method="POST" action="{{ url_for('index') }}">
-                {{ form.csrf_token }}
-                {{ form.username.label }}
-                {{ form.username(size=20) }}
-                {{ form.password.label }}
-                {{ form.password(size=20) }}
-                <button type="submit" value="Add" class="btn btn-primary">Submit</button>
-            </form>
+    </section>
+    <div class="wrapper">
+        <form method="POST" action="{{ url_for('index') }}">
+            {{ form.csrf_token }}
+            <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
+            <hr>
+            <h1>Login</h1>
+            <div class="input-box">
+                {{ form.username(size=20, class_='username-box', placeholder="Username") }}
+            </div>
+            <div class="input-box">
+                {{ form.password(size=20, class_='password-box', placeholder="Password") }}
+            </div>
+            <div class="input-field">
+                <input type="submit" value="Login" class="input-submit"></input>
+            </div>
+            <hr>    
+            <div class="support">
+                <a href="#">Forgot Password?</a>
+            </div>
+        </form>
         
-            {% if error != "" %}
-            <p> {{ error }} </p>
-            {% endif %}
-        </div>
-     </section>
+        <!--<form method="POST" action="{{ url_for('index') }}">
+            {{ form.csrf_token }}
+            {{ form.username.label }}
+            {{ form.username(size=20) }}
+            {{ form.password.label }}
+            {{ form.password(size=20) }}
+            <button type="submit" value="Add" class="btn btn-primary">Submit</button>
+        </form>
+        
+        {% if error != "" %}
+        <p> {{ error }} </p>
+        {% endif %}-->
+    </div>
 </body>
