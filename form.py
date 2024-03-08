@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField
-from wtforms.validators import DataRequired
+from wtforms import StringField, PasswordField, SelectField
+from wtforms.validators import DataRequired, InputRequired
 
 
 class LoginForm(FlaskForm):
@@ -16,3 +16,12 @@ class RegistrationForm(FlaskForm):
         label='Password', validators=[DataRequired()])
     confirm_pass = PasswordField(
         label='Password', validators=[DataRequired()])
+    
+
+class addAsset(FlaskForm):
+
+    name = StringField(label='Brand Name', validators=[DataRequired(), InputRequired()])
+    category = SelectField(label='Category', choices=['Mouse', 'Keyboard'])
+    asset_tag = StringField(label='Asset Tag', validators=[DataRequired()], default="None")
+    serial_no = StringField(label='Serial Number', validators=[DataRequired()], default="None")
+

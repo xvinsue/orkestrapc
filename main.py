@@ -2,9 +2,10 @@ from flask import Flask, render_template, request, jsonify, url_for, send_from_d
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from icecream import ic
-from form import LoginForm
+from form import LoginForm, addAsset
 import hashlib
-
+from models import db, User, Asset, Employee, Stock
+from sqlalchemy import cast, text
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
@@ -16,48 +17,8 @@ app.config['SECRET_KEY'] = 'your secret keylalal242ss'
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-# ------------------ DATABASE -------------------
-db = SQLAlchemy(app)
+db.init_app(app)
 
-class User(db.Model, UserMixin):
-    __tablename__ = 'user'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.Text)
-    password = db.Column(db.String(200))
-    type = db.Column(db.Text)
-
-class Asset(db.Model):
-    __tablename__ = 'asset'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    stock_id = db.Column(db.Integer, db.ForeignKey('stock.id'))
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    replacement_no = db.Column(db.Integer, nullable=True)
-    date_assigned = db.Column(db.Text)
-
-
-class Stock(db.Model):
-    __tablename__ = 'stock'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.Text, unique=False, nullable=False)
-    category = db.Column(db.String(30), unique=False, nullable=False)
-    asset_tag = db.Column(db.String(30), unique=False, nullable=False)
-    serial_number = db.Column(db.String(30), unique=False, nullable=False)
-
-    
-class Employee(db.Model):
-    __tablename__ = "employee"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    full_name = db.Column(db.Text)
-    # accountability_path = db.Column(db.Text)
-    role = db.Column(db.Text)
-
-
-def create_database():
-    db.create_all()
-
-
-with app.app_context():
-    create_database()
 
 # ----------------- USEF DEF -----------------
 
@@ -121,7 +82,6 @@ def hash_sha256(data):
     sha256 = hashlib.sha256()
     sha256.update(data.encode('utf-8'))
     return sha256.hexdigest()
-
 
 
 # This route is used for the search function from both search.html and view.html
@@ -267,6 +227,58 @@ def view():
  
     return render_template('view.html', agents=agents, number_of_assets=number_of_assets, emp_details=emp_details, error=error)
 
+# ----------------------- CRUD FOR ASSET ONLY ----------------------------
+
+@app.route("/add-asset", methods=['POST', 'GET'])
+def add_asset_form():
+
+    form = addAsset()
+    error = ""
+    if request.method == 'POST':
+
+        name = request.form.get('name')
+        category = request.form.get('category')
+        asset_tag = request.form.get('asset_tag')
+        serial_no = request.form.get('serial_no')
+
+        is_exist = Stock.query.filter_by(asset_tag=asset_tag) \
+                            .filter_by(category=category) \
+                            .first()
+        
+        if not is_exist:
+
+            data = Stock(name=name, category=category, asset_tag=asset_tag, serial_number=serial_no)
+
+            db.session.add(data)
+            db.session.commit()
+
+            error = "Asset successfully added."
+        else:
+            error = f"It seems like asset-tag {asset_tag} for asset category {category} already exists."
+        return render_template("add-asset.html", error=error, form=form)
+
+    return render_template('add-asset.html', form=form, error=error)
+
+# ---------------- EXPERIMENTAL ---------------------
+
+@app.route("/asset-view", methods=['GET'])
+def asset_view():
+    
+    msg = ""
+    all_stocks_query = """
+    SELECT * FROM stock
+    WHERE id NOT IN (
+    SELECT stock_id FROM asset
+    );
+    """
+
+    stocks_not_in_asset = db.session.execute(text(all_stocks_query))
+
+    if not stocks_not_in_asset:
+
+        msg = "No assets that are currently not assigned found."
+
+    return render_template("add-asset.html", msg=msg, stocks=stocks_not_in_asset)
 
 
 
