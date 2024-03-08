@@ -34,19 +34,9 @@
             <div class="support">
                 <a href="#">Forgot Password?</a>
             </div>
+            {% if error != "" %}
+            <p> {{ error }} </p>
+            {% endif %}
         </form>
-        
-        <!--<form method="POST" action="{{ url_for('index') }}">
-            {{ form.csrf_token }}
-            {{ form.username.label }}
-            {{ form.username(size=20) }}
-            {{ form.password.label }}
-            {{ form.password(size=20) }}
-            <button type="submit" value="Add" class="btn btn-primary">Submit</button>
-        </form>
-        
-        {% if error != "" %}
-        <p> {{ error }} </p>
-        {% endif %}-->
     </div>
 </body>
