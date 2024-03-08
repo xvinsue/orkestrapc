@@ -10,15 +10,17 @@
 </head>
 
 <body>
-    <section class="header">
+    <header>
         <nav>
-         <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
+            <a href="{{ url_for('index') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
         </nav>
-    </section>
+    </header>
+    
+    <div class="container">   
     <div class="wrapper">
-        <form method="POST" action="{{ url_for('index') }}">
+        <form method="POST" action="{{ url_for('login') }}">
             {{ form.csrf_token }}
-            <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
+            <a href="{{ url_for('index') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
             <hr>
             <h1>Login</h1>
             <div class="input-box">
@@ -39,4 +41,5 @@
             {% endif %}
         </form>
     </div>
+</section>
 </body>
