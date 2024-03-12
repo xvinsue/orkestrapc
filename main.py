@@ -296,6 +296,20 @@ def delete_asset(asset_id):
 
     return redirect(url_for('asset_view'))
 
+@app.route("/update-asset/<num>", methods=['GET', 'POST'])
+@login_required
+def update_asset(num):
+
+    form = addAsset()  # Assuming addAsset() creates the form object
+    asset = Stock.query.filter_by(id=num).first()
+
+    if form.validate_on_submit():
+        # Update asset data based on form data (logic omitted for brevity)
+        return redirect(url_for('asset_view'))  # Redirect after update
+
+    return render_template('update-asset.html', form=form, asset=asset)
+
+
 
 # ----------------- NO CHANGES NEEDED PROBABLY -----------------
 # ----------------- LOGIN, HOME, LOGOUT ------------------

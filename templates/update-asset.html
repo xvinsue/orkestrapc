@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Add or Remove Input Fields Dynamically</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            margin-top: 1%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #rowAdder {
+            margin-left: 17px;
+        }
+    </style>
+</head>
+
+<body>
+    <form method="POST" action="{{ url_for('update_asset', num=num) }}">  {{ form.csrf_token }}
+
+        {{ form.name.label }}
+        {{ form.name(size=20, value=asset.name) }}  
+
+        {{ form.category.label }}
+        {{ form.category() }}   
+
+        {{ form.asset_tag.label }}
+        {{ form.asset_tag(size=20, value=asset.asset_tag) }}  
+        
+        {{ form.serial_no.label }}
+        {{ form.serial_no(size=20, value=asset.serial_number) }} 
+         <input type="submit" value="Update">
+      </form>
+      
+          
+    {% if error %}
+
+    <p style="color:red;">{{ error }}</p>
+
+    {% endif %}
+
+</body>
+
+</html>
