@@ -241,9 +241,10 @@ def add_asset_form():
         asset_tag = request.form.get('asset_tag')
         serial_no = request.form.get('serial_no')
 
-        is_exist = Stock.query.filter_by(asset_tag=asset_tag) \
-                            .filter_by(category=category) \
-                            .first()
+        is_exist = Stock.query.filter(
+            (Stock.asset_tag == asset_tag) | (asset_tag is None)
+        ).first()
+
         
         if not is_exist:
 
@@ -264,6 +265,7 @@ def add_asset_form():
 @app.route("/asset-view", methods=['GET'])
 def asset_view():
     
+    
     msg = ""
     all_stocks_query = """
     SELECT * FROM stock
@@ -276,10 +278,23 @@ def asset_view():
 
     if not stocks_not_in_asset:
 
-        msg = "No assets that are currently not assigned found."
+        msg = "No unassigned assets found."
 
-    return render_template("add-asset.html", msg=msg, stocks=stocks_not_in_asset)
+    return render_template("asset-view.html", msg=msg, stocks=stocks_not_in_asset)
 
+# Delete asset since the original query gets
+# all assets that are not currently assigned
+@app.route("/delete-asset/<asset_id>", methods=['GET', 'POST'])
+@login_required
+def delete_asset(asset_id):
+
+    flash(f'Asset {asset_id} successfully deleted!')
+    asset = Stock.query.filter_by(id=asset_id).first()
+
+    db.session.delete(asset)
+    db.session.commit()
+
+    return redirect(url_for('asset_view'))
 
 
 # ----------------- NO CHANGES NEEDED PROBABLY -----------------
