@@ -285,7 +285,7 @@ def asset_view():
 # ----------------- NO CHANGES NEEDED PROBABLY -----------------
 # ----------------- LOGIN, HOME, LOGOUT ------------------
 @app.route("/login", methods=['GET', 'POST'])
-def index():
+def login():
 
     form = LoginForm()
 
@@ -310,8 +310,11 @@ def index():
     return render_template("login.html", form=form)
 
 @app.route("/")
-def home():
+def index():
     return render_template("index.html")
+@app.route("/home")
+def home():
+    return render_template("home.html")
 
 @app.route("/logout")
 def logout():
