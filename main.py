@@ -296,18 +296,31 @@ def delete_asset(asset_id):
 
     return redirect(url_for('asset_view'))
 
+# Update unassigned assets
 @app.route("/update-asset/<num>", methods=['GET', 'POST'])
 @login_required
-def update_asset(num):
+def asset_update(num):
 
-    form = addAsset()  # Assuming addAsset() creates the form object
+    form = addAsset() 
     asset = Stock.query.filter_by(id=num).first()
+    ic("JOJO")
 
-    if form.validate_on_submit():
-        # Update asset data based on form data (logic omitted for brevity)
-        return redirect(url_for('asset_view'))  # Redirect after update
+    if request.method == 'POST':
+        ic("POST?")
+        name = request.form.get('name')
+        category = request.form.get('category')
+        asset_tag = request.form.get('asset_tag')
+        serial_no = request.form.get('serial_no')
 
-    return render_template('update-asset.html', form=form, asset=asset)
+        asset.name = name
+        asset.category = category
+        asset.asset_tag = asset_tag
+        asset.serial_number = serial_no
+        db.session.commit()
+
+        return redirect(url_for('asset_view'))  
+
+    return render_template('update-asset.html', form=form, asset=asset,num=num)
 
 
 

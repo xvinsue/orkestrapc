@@ -16,7 +16,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Add Asset</h1>
+        <h1>Unassigned Assets</h1>
         {% if msg %}
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <strong>{{ msg }} </strong> 
@@ -63,7 +63,7 @@
                 <a href="{{ url_for('delete_asset', asset_id=stock.id) }}" class="confirmation">  <i class="fa-solid fa-trash"></i>
                 </a>
                 &nbsp;
-                <a href="{{ url_for('delete_asset', asset_id=stock.id) }}">
+                <a href="{{ url_for('asset_update', num=stock.id) }}">
                     <i class="fa-solid fa-pencil"></i>
                   </a>
               </td>

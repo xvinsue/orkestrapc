@@ -22,7 +22,8 @@
 </head>
 
 <body>
-    <form method="POST" action="{{ url_for('update_asset', num=num) }}">  {{ form.csrf_token }}
+    <form method="POST" action="{{ url_for('asset_update', num=num) }}">  
+        {{ form.csrf_token }}
 
         {{ form.name.label }}
         {{ form.name(size=20, value=asset.name) }}  
