@@ -4,90 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orkestra Inventory System</title>
+    <link href="static\css\styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href=
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    </head>
 </head>
 
-<style>
-    table, th, td {
-  border: 1px solid black;
-}
-
-  .pill-input {
-    pointer-events: none;
-  background-color: #EFF4FF;
-  border: none;
-  color: #2557D6;
-  padding: 10px 20px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  margin-right: 13px;
-  margin-left: -1px;
-  margin-bottom: 10px;
-  border-radius: 100px;
-}
-
-</style>
 <body>
-    <h1>Orkestra Inventory System</h1>
-
-    <form method="POST" action="{{ url_for('search') }}">
-        <label for="fname-view">Full Name:</label><br>
-        <input type="text" id="fname-view" name="fname-view"><br>
-        <input type="submit" value="Submit">
-    </form> 
-
-    <table>
-        <thead>
-            <tr>
-                <th>Employee Name</th>
-                <th>Asset Name</th>
-                <th>Category</th>
-                <th>Asset Tag</th>
-                <th>Serial Number</th>
-                <th>Replacement No</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for emp_name, asset_list in emp_details.items() %}
-            <tr>
-                <td rowspan="{{ asset_list|length }}">{{ emp_name }}</td>
-                {% for asset in asset_list %}
-                <td>{{ asset['name'] }}</td>
-                <td>{{ asset['category'] }}</td>
-                <td>{{ asset['asset_tag'] }}</td>
-                <td>{{ asset['serial_number'] }}</td>
-                <td>{{ asset['replacement_no'] }}</td>
-                </tr>
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
+    <header>
+        <nav>
+         <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
+         <div class="nav-links">
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Agents</a></li>
+                <li><a href="#">Peripherals</a></li>
+                <li><a href="{{ url_for('login') }}">Logout</a></li>
+            </ul>   
+        </div>
+        </nav>
+    </header>
+    <div class="view">
+        <section class="viewHeader">
+            <h1>Orkestra Inventory System</h1>
+        </section>
+        <section class="viewTable">
+            <table>
+                <thead>
+                    <tr>
+                        <th rowspan="2">Employee Name</th>
+                        <th rowspan="2">Asset Name</th>
+                        <th rowspan="2">Category</th>
+                        <th rowspan="2">Asset Tag</th>
+                        <th rowspan="2">Serial Number</th>
+                        <th rowspan="2">Replacement No</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emp_name, asset_list in emp_details.items() %}
+                    <tr>
+                        <td rowspan="{{ asset_list|length }}">{{ emp_name }}</td>
+                        {% for asset in asset_list %}
+                        <td>{{ asset['name'] }}</td>
+                        <td>{{ asset['category'] }}</td>
+                        <td>{{ asset['asset_tag'] }}</td>
+                        <td>{{ asset['serial_number'] }}</td>
+                        <td>{{ asset['replacement_no'] }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        
+            {% if error %}
+        
+            <p>{{ error }}</p>
+        
+            {% endif %}
+        </div>
+    </div>
     
-
-    {% if number_of_assets %}
-    {%  for category, count in number_of_assets %}
-
-    <label for="pill-input">Total {{ category }}:</label>
-    <span class="pill-input">{{ count }}</span>
-    {% endfor %}
-    {% else %}
-    <span class="pill-input">No assets found.</span>
-
-    {% endif %}
-
-    {% if agents %}
-
-    <label for="pill-input">Total Agents:</label>
-    <span class="pill-input">{{ agents }}</span>
-    {% endif %}
-
-
-    {% if error %}
-
-    <p>{{ error }}</p>
-
-    {% endif %}
 </body>
 </html>

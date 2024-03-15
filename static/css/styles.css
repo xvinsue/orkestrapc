@@ -377,11 +377,53 @@ form h1{
     text-align: center;
     width: 500px;
 }
+.searchTable thead{
+    background-color: #191919;
+}
 .searchTable th, td{
     border: 1px solid #F6921E;
-    padding: 30px;
+    padding: 20px;
 }
 .searchTable td a{
     color: white;
     text-decoration: none;
+}
+
+/* VIEW */
+.view{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+.viewHeader{
+    width: 500px;
+    height: 10%;
+    background-color: #F6921E;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 .4rem .8rem #0005;
+    border-radius: 15px 40px;
+    color: #2E2E2E;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.viewTable table{
+    margin: auto;
+    color: white;
+    border-collapse: collapse;
+    text-align: center;
+    width: 1500px;
+}
+.viewTable thead{
+    font-size: 15px;
+    border: 1px solid #F6921E;
+    background-color: #191919;
+}
+.viewTable th{
+    padding: 20px;
+}
+.viewTable tbody{
+    font-size: 15px;
+    border: transparent;
 }
