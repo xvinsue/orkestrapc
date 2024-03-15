@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Add or Remove Input Fields Dynamically</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            margin-top: 1%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #rowAdder {
+            margin-left: 17px;
+        }
+    </style>
+</head>
+
+<body>
+    <form method="POST" action="{{ url_for('assign_asset') }}">
+        {{ form.csrf_token}}
+
+    <div class="input-wrapper">
+        
+      {{ form.name.label }}: {{ form.name }}
+      {{ form.asset_tag.label }}: {{ form.asset_tag(size=20) }} 
+      {{ form.serial_no.label }}: {{ form.serial_no(size=20) }} 
+</div>
+
+
+
+<input type="hidden" id="num_fields" name="num_fields" value="1">  
+    <input type="submit" value="Add">
+    </form>
+          
+    {% if error %}
+
+    <p style="color:red;">{{ error }}</p>
+
+    {% endif %}
+
+
+    <script>
+  $(document).ready(function() {
+    $('#name-1').on('change', function() {
+      var selectedValue = $(this).val();
+
+      
+      $.getJSON('/get_categories', { a: selectedValue }, function(data) {
+        $('#asset-1').empty();
+
+        
+        $.each(data, function() {
+        $('#asset-1').val(this); 
+      });
+
+      });
+    });
+  });
+</script>
+</body>
+
+</html>

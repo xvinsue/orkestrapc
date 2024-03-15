@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify, url_for, send_from_d
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from icecream import ic
-from form import LoginForm, addAsset
+from form import LoginForm, addAsset, assignAsset
 import hashlib
 from models import db, User, Asset, Employee, Stock
 from sqlalchemy import cast, text
@@ -260,8 +260,6 @@ def add_asset_form():
 
     return render_template('add-asset.html', form=form, error=error)
 
-# ---------------- EXPERIMENTAL ---------------------
-
 @app.route("/asset-view", methods=['GET'])
 def asset_view():
     
@@ -303,10 +301,10 @@ def asset_update(num):
 
     form = addAsset() 
     asset = Stock.query.filter_by(id=num).first()
-    ic("JOJO")
+    
 
     if request.method == 'POST':
-        ic("POST?")
+        
         name = request.form.get('name')
         category = request.form.get('category')
         asset_tag = request.form.get('asset_tag')
@@ -323,8 +321,95 @@ def asset_update(num):
     return render_template('update-asset.html', form=form, asset=asset,num=num)
 
 
+# ---------------- EXPERIMENTAL ---------------------
+# Dynamically adding selectField values using AJAX
+@app.route('/get_select_options')
+def get_select_options():
+    # Can be replaced with database instead but for now this is good
+    options = [
+        {'value': 'Keyboard', 'label': 'Keyboard'},
+        {'value': 'Mouse', 'label': 'Option 2'},
+        {'value': 'option3', 'label': 'Option 3'},
+    ]
+    return jsonify(options)
 
-# ----------------- NO CHANGES NEEDED PROBABLY -----------------
+
+# @app.route("/assign-asset", methods=['GET', 'POST'])
+# @login_required
+# def assign_asset():
+
+#     form = assignAsset()
+
+#     all_stocks_query = """
+#     SELECT * FROM stock
+#     WHERE id NOT IN (
+#     SELECT stock_id FROM asset
+#     );
+#     """
+#     stocks_not_in_asset = db.session.execute(text(all_stocks_query))
+
+#     if not stocks_not_in_asset:
+
+#         msg = "No unassigned assets found."
+
+#     if request.method == 'POST':
+
+#         # Loop through the number of fields
+#         num_fields = int(request.form.get('num_fields'))
+#         for i in range(1, num_fields + 1):  
+#             item = request.form.get('name-' + str(i))
+#             item2 = request.form.get('cat-' + str(i))
+#             ic(item)
+#             ic(item2)
+      
+#     return render_template('assign-asset copy.html', form=form)
+
+@app.route("/get_categories", methods=['POST', 'GET'])
+def get_categories():
+  
+  name = request.args.get('a')
+  ic(name)
+  # Fetch categories based on the name and field name (modify query)
+  categories = db.session.query(Stock.category).filter_by(name=name).first()
+ 
+  ic(categories)
+
+  return jsonify(categories)
+
+# SUGGEST CHANGES GO TO VIEW AND WITH ID
+# SO BASICALLY USER NEEDS TO JUST SIMPLY INPUT ID OF THE ASSET AND THEN WHICH USER
+
+
+@app.route("/assign-asset", methods=['GET', 'POST'])
+@login_required
+def assign_asset():
+    form = assignAsset()
+
+  
+    # Fetch data for select fields
+    names = db.session.query(Stock.name).distinct().all() 
+    asset_tags = db.session.query(Stock.asset_tag).distinct().all()  
+    serial_nos = db.session.query(Stock.serial_number).distinct().all()  
+    # users = db.session.query(User.username).all()  
+
+    # Convert fetched data into appropriate format for choices
+    name_choices = [(name, name) for name, in names]  # Create tuples for SelectField
+    asset_tag_choices = [(tag, tag) for tag, in asset_tags]
+    serial_no_choices = [(serial, serial) for serial, in serial_nos]
+    # user_choices = [(username, username) for username, in users]
+
+    # Populate fields with fetched data
+    form.name.choices = name_choices
+    form.asset_tag.choices = asset_tag_choices
+    form.serial_no.choices = serial_no_choices
+    # form.user.choices = user_choices
+
+
+      
+    return render_template('assign-asset copy.html', form=form)
+
+
+# ----------------- NO CHANGES NEEDED PROBABLY  DOWN HERE-----------------
 # ----------------- LOGIN, HOME, LOGOUT ------------------
 @app.route("/login", methods=['GET', 'POST'])
 def index():
@@ -364,7 +449,7 @@ def logout():
 @login_manager.user_loader
 def load_user(user_id):
 
-    return User.query.get(int(user_id))
+    return db.session.get(User,(user_id))
 
 
 if __name__ == '__main__':
