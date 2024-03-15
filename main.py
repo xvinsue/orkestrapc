@@ -364,7 +364,7 @@ def get_select_options():
 #             item2 = request.form.get('cat-' + str(i))
 #             ic(item)
 #             ic(item2)
-      
+      #
 #     return render_template('assign-asset copy.html', form=form)
 
 @app.route("/get_categories", methods=['POST', 'GET'])
