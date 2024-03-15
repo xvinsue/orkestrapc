@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orkestra Inventory System</title>
+    <link rel="stylesheet" href="static\css\styles.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body>
+    <header>
+        <nav>
+         <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
+         <div class="nav-links">
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Agents</a></li>
+                <li><a href="#">Peripherals</a></li>
+                <li><a href="{{ url_for('login') }}">Logout</a></li>
+            </ul>   
+        </div>
+        </nav>
+    </header>
+    <div class="db-home">
+        <div class="db-container">
+            <div class="db-cards">
+                <article class="db-cards-article">
+                    <img src="static\css\assets\agent1.jpg" alt="image" class="card-img">
+                    <div class="card-data">
+                        <span class="card-script">Orkestra Agents</span>
+                        <h2 class="card-title">Super Heroes</h2>
+                        <a href="#" class="card-button">Explore</a>
+                    </div>
+                </article>
+                <article class="db-cards-article">
+                    <img src="static\css\assets\pc1.jpg" alt="image" class="card-img">
+                    <div class="card-data">
+                        <span class="card-script">Orkestra Equipment</span>
+                        <h2 class="card-title">Super Tools</h2>
+                        <a href="#" class="card-button">Explore</a>
+                    </div>
+                </article>
+                <article class="db-cards-article">
+                    <img src="static\css\assets\agent2.jpg" alt="image" class="card-img">
+                    <div class="card-data">
+                        <span class="card-script">Orkestra Website</span>
+                        <h2 class="card-title">Technology</h2>
+                        <a href="#" class="card-button">Learn more</a>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="card-line">
+            <hr>
+        </div>
+    </div>
+</body>
