@@ -391,20 +391,26 @@ form h1{
 
 /* VIEW */
 .view{
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    grid-template-rows: 1fr 200px;
+    grid-column-gap: 20px;
+    grid-row-gap: 20px;
+    justify-items: center;
+    align-items: stretch;
+    padding: 1rem;
 }
 .viewHeader{
+    display: flex;
+    justify-content: center;
     width: 500px;
     height: 10%;
     background-color: #F6921E;
     padding: 1rem;
-    text-align: center;
     box-shadow: 0 .4rem .8rem #0005;
     border-radius: 15px 40px;
     color: #2E2E2E;
+    margin: auto;
     margin-top: 20px;
     margin-bottom: 20px;
 }
@@ -426,4 +432,50 @@ form h1{
 .viewTable tbody{
     font-size: 15px;
     border: transparent;
+}
+.viewCategory{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-weight: bold;
+    font-size: 15px;
+    text-align: center;
+    margin: auto;
+    background: #F6921E;
+    border-radius: 20px;
+    height: 240px;
+    width: 100%;
+}
+.viewCategory label{
+    margin-bottom: 100px;
+    font-weight: bold;
+    font-size: 20px;
+}
+.viewCategory span{
+    font-weight: thin;
+    font-size: 15px;
+}
+.viewAgent{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-weight: bold;
+    font-size: 15px;
+    text-align: center;
+    margin: auto;
+    background: #F6921E;
+    border-radius: 20px;
+    height: 260px;
+    width: 100%;
+}
+.viewAgent label{
+    margin-bottom: 100px;
+    font-weight: bold;
+    font-size: 20px;
+}
+.viewAgent span{
+    font-weight: thin;
+    font-size: 15px;
 }
