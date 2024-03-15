@@ -57,10 +57,28 @@
                 </tbody>
             </table>
         
+            {% if number_of_assets %}
+            {%  for category, count in number_of_assets %}
+
+            <label for="pill-input">Total {{ category }}:</label>
+            <span class="pill-input">{{ count }}</span>
+            {% endfor %}
+            {% else %}
+            <span class="pill-input">No assets found.</span>
+
+            {% endif %}
+
+            {% if agents %}
+
+            <label for="pill-input">Total Agents:</label>
+            <span class="pill-input">{{ agents }}</span>
+            {% endif %}
+
+
             {% if error %}
-        
+
             <p>{{ error }}</p>
-        
+
             {% endif %}
         </div>
     </div>
