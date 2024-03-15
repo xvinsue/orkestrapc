@@ -24,4 +24,3 @@ class assignAsset(FlaskForm):
     agent_name = SelectField(label='Assign To:', validators=[DataRequired()])
     
 
-    

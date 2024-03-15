@@ -439,7 +439,23 @@ def assign_asset_controller():
         flash(msg, 'error')
 
     return redirect(url_for('assign_asset'))
+
+# Idea from the view route there is an edit button there
+# and it will pre-populate a form
+@app.route("/assign-update/<user_id>", methods=['GET', 'POST'])
+def assign_update():
+
+    return render_template('assign-update.html')
     
+
+
+
+
+
+
+
+
+
 
 # ----------------- NO CHANGES NEEDED PROBABLY  DOWN HERE-----------------
 # ----------------- LOGIN, HOME, LOGOUT ------------------
