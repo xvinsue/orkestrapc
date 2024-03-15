@@ -2,9 +2,10 @@ from flask import Flask, render_template, request, jsonify, url_for, send_from_d
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from icecream import ic
-from form import LoginForm
+from form import LoginForm, addAsset
 import hashlib
-
+from models import db, User, Asset, Employee, Stock
+from sqlalchemy import cast, text
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
@@ -16,64 +17,49 @@ app.config['SECRET_KEY'] = 'your secret keylalal242ss'
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-# ------------------ DATABASE -------------------
-db = SQLAlchemy(app)
-
-class User(db.Model, UserMixin):
-    __tablename__ = 'user'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.Text)
-    password = db.Column(db.String(200))
-    type = db.Column(db.Text)
-
-class Asset(db.Model):
-    __tablename__ = 'asset'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    stock_id = db.Column(db.Integer, db.ForeignKey('stock.id'))
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    replacement_no = db.Column(db.Integer, nullable=True)
-    date_assigned = db.Column(db.Text)
+db.init_app(app)
 
 
-class Stock(db.Model):
-    __tablename__ = 'stock'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.Text, unique=False, nullable=False)
-    category = db.Column(db.String(30), unique=False, nullable=False)
-    asset_tag = db.Column(db.String(30), unique=False, nullable=False)
-    serial_number = db.Column(db.String(30), unique=False, nullable=False)
+# ----------------- USEF DEF -----------------
 
-    
-class Employee(db.Model):
-    __tablename__ = "employee"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    full_name = db.Column(db.Text)
-    role = db.Column(db.Text)
+# Get total number of assets
+def numOfAssets():
 
-def create_database():
-    db.create_all()
+    category_counts = db.session.query(
+        Stock.category, db.func.count(Stock.id).label('count')
+    ) \
+    .group_by(Stock.category).all()
 
+    if category_counts:
+        for category, count in category_counts:
+            ic(f"Category: {category}, Count: {count}")
+        
+        return category_counts
 
-with app.app_context():
-    create_database()
+# Get all assets that are not currently not assigned yet.
+def unallocated_stocks():
+    unallocated_stocks = db.session.query(Stock) \
+    .outerjoin(Asset, Stock.id == Asset.stock_id) \
+    .filter(Asset.id == None) \
+    .all()
 
-# ------------------------- DATABASE ------------------------------
+    if unallocated_stocks:
 
-@app.route("/search", methods=['GET', 'POST'])
-@login_required
-def search():
-    search_name = '' 
-    match = []
+        for stock in unallocated_stocks:
+            ic(f"Unallocated Stock: {stock.name} (Category: {stock.category}), (Asset Tag: {stock.asset_tag})")
 
-    if request.method == 'POST':
-        search_name = request.form.get('fname')
-        match = get_employee_details(search_name)
-        ic(search_name)
+    return unallocated_stocks
 
-    return render_template('search.html', match=match)
+# Get total number of agents
+def total_agents():
 
+    total_agents = Employee.query.count()
 
+    if total_agents == 0 :
+        
+        return "No employees found"
 
+    return total_agents
 
 def get_employee_details(search_name=None):
     if search_name:
@@ -81,23 +67,63 @@ def get_employee_details(search_name=None):
         emp_details = db.session.query(Employee) \
             .filter(Employee.full_name.like(f"{search_name.lower()}%")) \
             .all()
-    else:
-        # Fetch all employees if no search term is provided
-        emp_details = db.session.query(Employee).all()
+ 
+    if len(emp_details) == 0:
+        full_names = False
 
-    # Convert to list of dictionaries with just full names
-    full_names = [{'full_name': emp.full_name, 'role': emp.role} for emp in emp_details]
+    else:
+        # Convert to list of dictionaries with just full names
+        full_names = [{'full_name': emp.full_name, 'role': emp.role} for emp in emp_details]
 
     return full_names
 
+# password for admin: stillmissinu
+def hash_sha256(data):
+    sha256 = hashlib.sha256()
+    sha256.update(data.encode('utf-8'))
+    return sha256.hexdigest()
 
+
+# This route is used for the search function from both search.html and view.html
+@app.route("/search", methods=['GET', 'POST'])
+@login_required
+def search():
+    search_name = ''
+    search_view = ''
+    match = []
+
+    if request.method == 'POST':
+
+        if 'fname' in request.form:
+            search_name = request.form.get('fname')
+            match = get_employee_details(search_name)
+           
+            return render_template('search.html', match=match)
+        elif 'fname-view' in request.form:
+
+            search_view = request.form.get('fname-view')
+            # Handle search based on view parameter
+            match = get_employee_details(search_view)
+
+            if match == False:
+                fullname = ""
+            else:
+                fullname = match[0]['full_name']
+
+            return redirect(url_for('getUser', fullname=fullname))
+    
+    return render_template("search.html")
+
+
+@app.route("/user/", defaults= {"fullname":None} ,methods=['GET', 'POST'])
 @app.route("/user/<fullname>", methods=['GET', 'POST'])
 @login_required
-def getUser(fullname=None):
+def getUser(fullname):
 
     error = ""
 
-    resolved_emp_details = db.session.query(
+    if fullname:
+        resolved_emp_details = db.session.query(
         Employee.full_name,
         Stock.name.label('asset_name'),
         Stock.category,
@@ -108,7 +134,7 @@ def getUser(fullname=None):
     .join(Asset, Employee.id == Asset.employee_id) \
     .join(Stock, Asset.stock_id == Stock.id)
 
-    if fullname:
+
         resolved_emp_details = resolved_emp_details.filter(Employee.full_name == fullname)
 
         resolved_emp_details = resolved_emp_details.filter(Employee.id != None) \
@@ -128,42 +154,23 @@ def getUser(fullname=None):
                     'serial_number': serial_number,
                     'replacement_no': replacement_no
                 })
-
-            ic(emp_details)
-
-            return render_template("view.html",  emp_details=emp_details)
+            number_of_assets = numOfAssets() 
+            agents = total_agents()
+            return render_template("view.html", agents=agents, number_of_assets=number_of_assets, emp_details=emp_details)
         else:
-            return render_template("view.html",  emp_details={}, error=f"No asset yet assigned to agent {fullname}")
-
-# ----------------- USEF DEF -----------------
-def numOfAssets():
-
-
-    category_counts = db.session.query(
-        Stock.category, db.func.count(Stock.id).label('count')
-    ) \
-    .group_by(Stock.category).all()
-
-    for category, count in category_counts:
-        print(f"Category: {category}, Count: {count}")
-
-def unallocated_stocks():
-    unallocated_stocks = db.session.query(Stock) \
-    .outerjoin(Asset, Stock.id == Asset.stock_id) \
-    .filter(Asset.id == None) \
-    .all()
-
-    for stock in unallocated_stocks:
-        print(f"Unallocated Stock: {stock.name} (Category: {stock.category}), (Asset Tag: {stock.asset_tag})")
+            error = f"No asset yet assigned to agent {fullname}"
+            return render_template("view.html",  emp_details={}, error=error)
+    else:
+        error = f"No fullname was provided"
+        return render_template("view.html",  emp_details={}, error=error)
 
 
-
-      
 @app.route("/view", methods=['GET'])
 @login_required
 def view():
     error = ""
     emp_details = {}
+    number_of_assets = ""
 
     # Get all assets that is currently assigned to an employee
 
@@ -196,6 +203,12 @@ def view():
     # Group data by employee name
     emp_details = {}
 
+    # Call the other necessary functions
+    number_of_assets = numOfAssets()
+    ic("num", number_of_assets)
+    unallocated_stocks()
+    agents = total_agents()
+
     if resolved_emp_details:
         for emp_name, asset_name, category, asset_tag, serial_number, replacement_no in resolved_emp_details:
             if emp_name not in emp_details:
@@ -207,22 +220,70 @@ def view():
                 'serial_number': serial_number,
                 'replacement_no': replacement_no
             })
-        numOfAssets()
-        unallocated_stocks()
+       
     else:
         error = "No assets assigned to any agents yet."
 
  
+    return render_template('view.html', agents=agents, number_of_assets=number_of_assets, emp_details=emp_details, error=error)
 
-    return render_template('view.html', emp_details=emp_details, error=error)
+# ----------------------- CRUD FOR ASSET ONLY ----------------------------
 
-# password for admin: stillmissinu
-def hash_sha256(data):
-    sha256 = hashlib.sha256()
-    sha256.update(data.encode('utf-8'))
-    return sha256.hexdigest()
+@app.route("/add-asset", methods=['POST', 'GET'])
+def add_asset_form():
+
+    form = addAsset()
+    error = ""
+    if request.method == 'POST':
+
+        name = request.form.get('name')
+        category = request.form.get('category')
+        asset_tag = request.form.get('asset_tag')
+        serial_no = request.form.get('serial_no')
+
+        is_exist = Stock.query.filter_by(asset_tag=asset_tag) \
+                            .filter_by(category=category) \
+                            .first()
+        
+        if not is_exist:
+
+            data = Stock(name=name, category=category, asset_tag=asset_tag, serial_number=serial_no)
+
+            db.session.add(data)
+            db.session.commit()
+
+            error = "Asset successfully added."
+        else:
+            error = f"It seems like asset-tag {asset_tag} for asset category {category} already exists."
+        return render_template("add-asset.html", error=error, form=form)
+
+    return render_template('add-asset.html', form=form, error=error)
+
+# ---------------- EXPERIMENTAL ---------------------
+
+@app.route("/asset-view", methods=['GET'])
+def asset_view():
+    
+    msg = ""
+    all_stocks_query = """
+    SELECT * FROM stock
+    WHERE id NOT IN (
+    SELECT stock_id FROM asset
+    );
+    """
+
+    stocks_not_in_asset = db.session.execute(text(all_stocks_query))
+
+    if not stocks_not_in_asset:
+
+        msg = "No assets that are currently not assigned found."
+
+    return render_template("add-asset.html", msg=msg, stocks=stocks_not_in_asset)
 
 
+
+# ----------------- NO CHANGES NEEDED PROBABLY -----------------
+# ----------------- LOGIN, HOME, LOGOUT ------------------
 @app.route("/login", methods=['GET', 'POST'])
 def login():
 
@@ -244,7 +305,7 @@ def login():
 
         else:
 
-            return render_template("login.html", form=form, error="There seems to be an error.")
+            return render_template("login.html", form=form, error="Wrong username or password.")
 
     return render_template("login.html", form=form)
 
@@ -265,7 +326,6 @@ def logout():
 def load_user(user_id):
 
     return User.query.get(int(user_id))
-
 
 
 if __name__ == '__main__':
