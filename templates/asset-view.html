@@ -79,22 +79,23 @@
   
   
       <script>
-      function myFunction() {
+function myFunction() {
   var input, filter, table, tr, td, i, txtValue;
   input = document.getElementById("myInput");
   filter = input.value.toUpperCase();
   table = document.getElementById("myTable");
   tr = table.getElementsByTagName("tr");
 
-  for (i = 0; i < tr.length; i++) {
+  // Skip the first row (header row)
+  for (i = 1; i < tr.length; i++) {
     td = tr[i].getElementsByTagName("td"); // Get all table data cells in the row
     var found = false; // Flag to check if a match is found
 
     for (var j = 0; j < td.length; j++) {
       txtValue = td[j].textContent || td[j].innerText;
       if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        found = true; // Set flag if a match is found in any column
-        break; // Exit inner loop if a match is found
+        found = true;
+        break;
       }
     }
 
@@ -104,7 +105,11 @@
       tr[i].style.display = "none";
     }
   }
+
+  // Ensure header row is visible when all rows are shown
+  table.tHead.style.display = "";
 }
+
 
         </script>
 

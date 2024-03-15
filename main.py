@@ -6,6 +6,7 @@ from form import LoginForm, addAsset, assignAsset
 import hashlib
 from models import db, User, Asset, Employee, Stock
 from sqlalchemy import cast, text
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
@@ -19,6 +20,8 @@ login_manager.init_app(app)
 
 db.init_app(app)
 
+current_date = datetime.now()
+formatted_date = current_date.strftime('%d/%m/%Y')
 
 # ----------------- USEF DEF -----------------
 
@@ -383,31 +386,60 @@ def get_categories():
 @app.route("/assign-asset", methods=['GET', 'POST'])
 @login_required
 def assign_asset():
+
+    msg = ""
     form = assignAsset()
 
-  
-    # Fetch data for select fields
-    names = db.session.query(Stock.name).distinct().all() 
-    asset_tags = db.session.query(Stock.asset_tag).distinct().all()  
-    serial_nos = db.session.query(Stock.serial_number).distinct().all()  
-    # users = db.session.query(User.username).all()  
+    all_stocks_query = """
+    SELECT * FROM stock
+    WHERE id NOT IN (
+    SELECT stock_id FROM asset
+    );
+    """
 
-    # Convert fetched data into appropriate format for choices
-    name_choices = [(name, name) for name, in names]  # Create tuples for SelectField
-    asset_tag_choices = [(tag, tag) for tag, in asset_tags]
-    serial_no_choices = [(serial, serial) for serial, in serial_nos]
-    # user_choices = [(username, username) for username, in users]
+    users = Employee.query.all()
 
-    # Populate fields with fetched data
-    form.name.choices = name_choices
-    form.asset_tag.choices = asset_tag_choices
-    form.serial_no.choices = serial_no_choices
-    # form.user.choices = user_choices
+    for user in users:
+        ic(user.id)
 
+    stocks_not_in_asset = db.session.execute(text(all_stocks_query)).fetchall()
 
-      
-    return render_template('assign-asset copy.html', form=form)
+    if not stocks_not_in_asset:
+        msg = "No unassigned assets found."
+    else:
+        form.id.choices = [(str(row[0]), str(row[0])) for row in stocks_not_in_asset]
+        form.agent_name.choices = [(str(row.id),  str(row.full_name + " (" + row.role + ")")) for row in users]
 
+    return render_template("assign-asset copy.html", form=form, msg=msg, stocks=stocks_not_in_asset)
+
+@app.route("/assign_asset_controller", methods=['POST'])
+@login_required
+def assign_asset_controller():
+
+    msg = ""
+
+    id = request.form.get('id')
+    agent_name = request.form.get('agent_name')
+
+    user_id = Employee.query.filter_by(id=agent_name).first()
+
+    if user_id:
+
+        me = Asset(stock_id=id, employee_id=user_id.id, replacement_no=0, date_assigned=formatted_date)
+
+        db.session.add(me)
+
+        db.session.commit()
+
+        msg = "Asset assigned successfully!"
+        flash(msg, 'success')
+    else:
+
+        msg = "Agent not found - please try again."
+        flash(msg, 'error')
+
+    return redirect(url_for('assign_asset'))
+    
 
 # ----------------- NO CHANGES NEEDED PROBABLY  DOWN HERE-----------------
 # ----------------- LOGIN, HOME, LOGOUT ------------------
