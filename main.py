@@ -2,10 +2,11 @@ from flask import Flask, render_template, request, jsonify, url_for, send_from_d
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from icecream import ic
-from form import LoginForm, addAsset
+from form import LoginForm, addAsset, assignAsset
 import hashlib
 from models import db, User, Asset, Employee, Stock
 from sqlalchemy import cast, text
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
@@ -19,6 +20,8 @@ login_manager.init_app(app)
 
 db.init_app(app)
 
+current_date = datetime.now()
+formatted_date = current_date.strftime('%d/%m/%Y')
 
 # ----------------- USEF DEF -----------------
 
@@ -241,9 +244,10 @@ def add_asset_form():
         asset_tag = request.form.get('asset_tag')
         serial_no = request.form.get('serial_no')
 
-        is_exist = Stock.query.filter_by(asset_tag=asset_tag) \
-                            .filter_by(category=category) \
-                            .first()
+        is_exist = Stock.query.filter(
+            (Stock.asset_tag == asset_tag) | (asset_tag is None)
+        ).first()
+
         
         if not is_exist:
 
@@ -259,10 +263,9 @@ def add_asset_form():
 
     return render_template('add-asset.html', form=form, error=error)
 
-# ---------------- EXPERIMENTAL ---------------------
-
 @app.route("/asset-view", methods=['GET'])
 def asset_view():
+    
     
     msg = ""
     all_stocks_query = """
@@ -276,13 +279,185 @@ def asset_view():
 
     if not stocks_not_in_asset:
 
-        msg = "No assets that are currently not assigned found."
+        msg = "No unassigned assets found."
 
-    return render_template("add-asset.html", msg=msg, stocks=stocks_not_in_asset)
+    return render_template("asset-view.html", msg=msg, stocks=stocks_not_in_asset)
+
+# Delete asset since the original query gets
+# all assets that are not currently assigned
+@app.route("/delete-asset/<asset_id>", methods=['GET', 'POST'])
+@login_required
+def delete_asset(asset_id):
+
+    flash(f'Asset {asset_id} successfully deleted!')
+    asset = Stock.query.filter_by(id=asset_id).first()
+
+    db.session.delete(asset)
+    db.session.commit()
+
+    return redirect(url_for('asset_view'))
+
+# Update unassigned assets
+@app.route("/update-asset/<num>", methods=['GET', 'POST'])
+@login_required
+def asset_update(num):
+
+    form = addAsset() 
+    asset = Stock.query.filter_by(id=num).first()
+    
+
+    if request.method == 'POST':
+        
+        name = request.form.get('name')
+        category = request.form.get('category')
+        asset_tag = request.form.get('asset_tag')
+        serial_no = request.form.get('serial_no')
+
+        asset.name = name
+        asset.category = category
+        asset.asset_tag = asset_tag
+        asset.serial_number = serial_no
+        db.session.commit()
+
+        return redirect(url_for('asset_view'))  
+
+    return render_template('update-asset.html', form=form, asset=asset,num=num)
+
+
+# ---------------- EXPERIMENTAL ---------------------
+# Dynamically adding selectField values using AJAX
+@app.route('/get_select_options')
+def get_select_options():
+    # Can be replaced with database instead but for now this is good
+    options = [
+        {'value': 'Keyboard', 'label': 'Keyboard'},
+        {'value': 'Mouse', 'label': 'Option 2'},
+        {'value': 'option3', 'label': 'Option 3'},
+    ]
+    return jsonify(options)
+
+
+# @app.route("/assign-asset", methods=['GET', 'POST'])
+# @login_required
+# def assign_asset():
+
+#     form = assignAsset()
+
+#     all_stocks_query = """
+#     SELECT * FROM stock
+#     WHERE id NOT IN (
+#     SELECT stock_id FROM asset
+#     );
+#     """
+#     stocks_not_in_asset = db.session.execute(text(all_stocks_query))
+
+#     if not stocks_not_in_asset:
+
+#         msg = "No unassigned assets found."
+
+#     if request.method == 'POST':
+
+#         # Loop through the number of fields
+#         num_fields = int(request.form.get('num_fields'))
+#         for i in range(1, num_fields + 1):  
+#             item = request.form.get('name-' + str(i))
+#             item2 = request.form.get('cat-' + str(i))
+#             ic(item)
+#             ic(item2)
+      #
+#     return render_template('assign-asset copy.html', form=form)
+
+@app.route("/get_categories", methods=['POST', 'GET'])
+def get_categories():
+  
+  name = request.args.get('a')
+  ic(name)
+  # Fetch categories based on the name and field name (modify query)
+  categories = db.session.query(Stock.category).filter_by(name=name).first()
+ 
+  ic(categories)
+
+  return jsonify(categories)
+
+# SUGGEST CHANGES GO TO VIEW AND WITH ID
+# SO BASICALLY USER NEEDS TO JUST SIMPLY INPUT ID OF THE ASSET AND THEN WHICH USER
+
+
+@app.route("/assign-asset", methods=['GET', 'POST'])
+@login_required
+def assign_asset():
+
+    msg = ""
+    form = assignAsset()
+
+    all_stocks_query = """
+    SELECT * FROM stock
+    WHERE id NOT IN (
+    SELECT stock_id FROM asset
+    );
+    """
+
+    users = Employee.query.all()
+
+    for user in users:
+        ic(user.id)
+
+    stocks_not_in_asset = db.session.execute(text(all_stocks_query)).fetchall()
+
+    if not stocks_not_in_asset:
+        msg = "No unassigned assets found."
+    else:
+        form.id.choices = [(str(row[0]), str(row[0])) for row in stocks_not_in_asset]
+        form.agent_name.choices = [(str(row.id),  str(row.full_name + " (" + row.role + ")")) for row in users]
+
+    return render_template("assign-asset copy.html", form=form, msg=msg, stocks=stocks_not_in_asset)
+
+@app.route("/assign_asset_controller", methods=['POST'])
+@login_required
+def assign_asset_controller():
+
+    msg = ""
+
+    id = request.form.get('id')
+    agent_name = request.form.get('agent_name')
+
+    user_id = Employee.query.filter_by(id=agent_name).first()
+
+    if user_id:
+
+        me = Asset(stock_id=id, employee_id=user_id.id, replacement_no=0, date_assigned=formatted_date)
+
+        db.session.add(me)
+
+        db.session.commit()
+
+        msg = "Asset assigned successfully!"
+        flash(msg, 'success')
+    else:
+
+        msg = "Agent not found - please try again."
+        flash(msg, 'error')
+
+    return redirect(url_for('assign_asset'))
+
+# Idea from the view route there is an edit button there
+# and it will pre-populate a form
+@app.route("/assign-update/<user_id>", methods=['GET', 'POST'])
+def assign_update():
+
+    return render_template('assign-update.html')
+    
 
 
 
-# ----------------- NO CHANGES NEEDED PROBABLY -----------------
+
+
+
+
+
+
+
+# ----------------- NO CHANGES NEEDED PROBABLY  DOWN HERE-----------------
 # ----------------- LOGIN, HOME, LOGOUT ------------------
 @app.route("/login", methods=['GET', 'POST'])
 def login():
@@ -325,7 +500,7 @@ def logout():
 @login_manager.user_loader
 def load_user(user_id):
 
-    return User.query.get(int(user_id))
+    return db.session.get(User,(user_id))
 
 
 if __name__ == '__main__':
