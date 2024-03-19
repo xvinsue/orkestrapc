@@ -482,3 +482,29 @@ form h1{
     font-size: 15px;
 }
 
+/* ASSET VIEW */
+
+.assetView{
+    justify-content: center;
+    text-align: center;
+    padding: 30px;
+}
+.assetHeader h1{
+    font-weight: bold;
+    color: white;
+}
+.assetTable table{
+    margin-top: 10px;
+    border: 1px solid #F6921E;
+    border-collapse: collapse;
+}
+.assetTable a{
+    text-decoration: none;
+}
+.assetTable thead{
+    color: white;
+    background-color: #191919;
+}
+.assetTable tbody{
+    color: white;
+}
