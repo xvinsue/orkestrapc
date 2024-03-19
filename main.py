@@ -125,6 +125,7 @@ def getUser(fullname):
     error = ""
 
     if fullname:
+
         resolved_emp_details = db.session.query(
         Employee.full_name,
         Stock.name.label('asset_name'),
