@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from icecream import ic
 from form import LoginForm, addAsset, assignAsset
 import hashlib
-from models import db, User, Asset, Employee, Stock
+from models import db, User, Asset, Employee, Stock, ReplaceNo
 from sqlalchemy import cast, text
 from datetime import datetime
 
@@ -19,6 +19,8 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 db.init_app(app)
+
+with app.app_context(): db.create_all()
 
 current_date = datetime.now()
 formatted_date = current_date.strftime('%d/%m/%Y')
@@ -125,16 +127,19 @@ def getUser(fullname):
     error = ""
 
     if fullname:
+
+
         resolved_emp_details = db.session.query(
         Employee.full_name,
         Stock.name.label('asset_name'),
         Stock.category,
         Stock.asset_tag,
         Stock.serial_number,
-        Asset.replacement_no
+        ReplaceNo.replacement_no
     ) \
     .join(Asset, Employee.id == Asset.employee_id) \
-    .join(Stock, Asset.stock_id == Stock.id)
+    .join(Stock, Asset.stock_id == Stock.id)  \
+    .join(ReplaceNo, Asset.stock_id == ReplaceNo.stock_id)
 
 
         resolved_emp_details = resolved_emp_details.filter(Employee.full_name == fullname)
@@ -156,12 +161,12 @@ def getUser(fullname):
                     'serial_number': serial_number,
                     'replacement_no': replacement_no
                 })
-            number_of_assets = numOfAssets() 
-            agents = total_agents()
-            return render_template("view_user.html", agents=agents, number_of_assets=number_of_assets, emp_details=emp_details)
+
+            return render_template("view_user.html", emp_details=emp_details)
         else:
+            no_assets_flag = True
             error = f"No asset yet assigned to agent {fullname}"
-            return render_template("view_user.html",  emp_details={}, error=error)
+            return render_template("view_user.html", no_assets_flag=no_assets_flag , emp_details={}, error=error)
     else:
         error = f"No fullname was provided"
         return render_template("view_user.html",  emp_details={}, error=error)
@@ -188,17 +193,33 @@ def view():
             emp_id_assets[emp_id] = []
         emp_id_assets[emp_id].append(da.id)
     # Combine queries with joins and filtering
+    # resolved_emp_details = db.session.query(
+    #     Employee.full_name,
+    #     Stock.name.label('asset_name'),
+    #     Stock.category,
+    #     Stock.asset_tag,
+    #     Stock.serial_number,
+    #     ReplaceNo.replacement_no
+    # ) \
+    # .join(Asset, Employee.id == Asset.employee_id) \
+    # .join(Stock, Asset.stock_id == Stock.id) \
+    # .filter(Employee.id != None) \
+    # .order_by(Employee.full_name, Asset.id) \
+    # .all()
+        
     resolved_emp_details = db.session.query(
-        Employee.full_name,
-        Stock.name.label('asset_name'),
-        Stock.category,
-        Stock.asset_tag,
-        Stock.serial_number,
-        Asset.replacement_no
+    Employee.full_name,
+    Stock.name.label('asset_name'),
+    Stock.category,
+    Stock.asset_tag,
+    Stock.serial_number,
+    db.func.count(ReplaceNo.replacement_no).label('replacement_count')
     ) \
     .join(Asset, Employee.id == Asset.employee_id) \
     .join(Stock, Asset.stock_id == Stock.id) \
+    .outerjoin(ReplaceNo, Asset.id == ReplaceNo.stock_id) \
     .filter(Employee.id != None) \
+    .group_by(Employee.full_name, Stock.id) \
     .order_by(Employee.full_name, Asset.id) \
     .all()
 
@@ -335,36 +356,6 @@ def get_select_options():
     return jsonify(options)
 
 
-# @app.route("/assign-asset", methods=['GET', 'POST'])
-# @login_required
-# def assign_asset():
-
-#     form = assignAsset()
-
-#     all_stocks_query = """
-#     SELECT * FROM stock
-#     WHERE id NOT IN (
-#     SELECT stock_id FROM asset
-#     );
-#     """
-#     stocks_not_in_asset = db.session.execute(text(all_stocks_query))
-
-#     if not stocks_not_in_asset:
-
-#         msg = "No unassigned assets found."
-
-#     if request.method == 'POST':
-
-#         # Loop through the number of fields
-#         num_fields = int(request.form.get('num_fields'))
-#         for i in range(1, num_fields + 1):  
-#             item = request.form.get('name-' + str(i))
-#             item2 = request.form.get('cat-' + str(i))
-#             ic(item)
-#             ic(item2)
-      #
-#     return render_template('assign-asset copy.html', form=form)
-
 @app.route("/get_categories", methods=['POST', 'GET'])
 def get_categories():
   
@@ -423,11 +414,14 @@ def assign_asset_controller():
 
     if user_id:
 
-        me = Asset(stock_id=id, employee_id=user_id.id, replacement_no=0, date_assigned=formatted_date)
+        asset = Asset(stock_id=id, employee_id=user_id.id, date_assigned=formatted_date)
+        db.session.add(asset)
 
-        db.session.add(me)
+        replacement_record = ReplaceNo(stock_id=id, employee_id=user_id.id, replacement_no=0)
+        db.session.add(replacement_record)
 
         db.session.commit()
+
 
         msg = "Asset assigned successfully!"
         flash(msg, 'success')
