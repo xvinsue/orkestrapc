@@ -118,7 +118,6 @@ def search():
     return render_template("search.html")
 
 
-@app.route("/user/", defaults= {"fullname":None} ,methods=['GET', 'POST'])
 @app.route("/user/<fullname>", methods=['GET', 'POST'])
 @login_required
 def getUser(fullname):
@@ -159,13 +158,13 @@ def getUser(fullname):
                 })
             number_of_assets = numOfAssets() 
             agents = total_agents()
-            return render_template("view.html", agents=agents, number_of_assets=number_of_assets, emp_details=emp_details)
+            return render_template("view_user.html", agents=agents, number_of_assets=number_of_assets, emp_details=emp_details)
         else:
             error = f"No asset yet assigned to agent {fullname}"
-            return render_template("view.html",  emp_details={}, error=error)
+            return render_template("view_user.html",  emp_details={}, error=error)
     else:
         error = f"No fullname was provided"
-        return render_template("view.html",  emp_details={}, error=error)
+        return render_template("view_user.html",  emp_details={}, error=error)
 
 
 @app.route("/view", methods=['GET'])
@@ -208,7 +207,6 @@ def view():
 
     # Call the other necessary functions
     number_of_assets = numOfAssets()
-    ic("num", number_of_assets)
     unallocated_stocks()
     agents = total_agents()
 
@@ -447,14 +445,6 @@ def assign_update():
 
     return render_template('assign-update.html')
     
-
-
-
-
-
-
-
-
 
 
 # ----------------- NO CHANGES NEEDED PROBABLY  DOWN HERE-----------------

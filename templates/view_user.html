@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orkestra Inventory System</title>
-    <link href="static\css\styles.css" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
     <link rel="stylesheet" href=
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
@@ -25,7 +26,7 @@
         </nav>
     </header>
     <section class="viewHeader">
-        <h1>Orkestra Inventory System</h1>
+        <h1>Orkestra Inventory Systsem</h1>
     </section>
     <div class="view">
         
@@ -45,9 +46,7 @@
                 <tbody>
                     {% for emp_name, asset_list in emp_details.items() %}
                     <tr>
-                        <td rowspan="{{ asset_list|length }}"><a href="{{ url_for('getUser', fullname=employee['full_name']) }}">
-                            {{ emp_name }}
-                        </a></td>
+                        <td rowspan="{{ asset_list|length }}">{{ emp_name }}</td>
                         {% for asset in asset_list %}
                         <td>{{ asset['name'] }}</td>
                         <td>{{ asset['category'] }}</td>
@@ -56,7 +55,6 @@
                         <td>{{ asset['replacement_no'] }}</td>
                         </tr>
                         {% endfor %}
-                        
                     </tr>
                     {% endfor %}
                 </tbody>
