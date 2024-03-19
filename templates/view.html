@@ -16,8 +16,8 @@
          <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
          <div class="nav-links">
             <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Agents</a></li>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('search') }}">Agents</a></li>
                 <li><a href="#">Peripherals</a></li>
                 <li><a href="{{ url_for('login') }}">Logout</a></li>
             </ul>   
