@@ -15,8 +15,8 @@
          <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
          <div class="nav-links">
             <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Agents</a></li>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('search') }}">Agents</a></li>
                 <li><a href="#">Peripherals</a></li>
                 <li><a href="{{ url_for('login') }}">Logout</a></li>
             </ul>   
@@ -31,7 +31,7 @@
                     <div class="card-data">
                         <span class="card-script">Orkestra Agents</span>
                         <h2 class="card-title">Super Heroes</h2>
-                        <a href="#" class="card-button">Explore</a>
+                        <a href="{{ url_for('search') }}" class="card-button">Explore</a>
                     </div>
                 </article>
                 <article class="db-cards-article">
@@ -47,7 +47,7 @@
                     <div class="card-data">
                         <span class="card-script">Orkestra Website</span>
                         <h2 class="card-title">Technology</h2>
-                        <a href="#" class="card-button">Learn more</a>
+                        <a href="https://orkestracommunications.com/" class="card-button">Learn more</a>
                     </div>
                 </article>
             </div>
