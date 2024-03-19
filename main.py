@@ -135,7 +135,8 @@ def getUser(fullname):
         Stock.category,
         Stock.asset_tag,
         Stock.serial_number,
-        ReplaceNo.replacement_no
+        ReplaceNo.replacement_no,
+        Asset.id.label('asset_id')
     ) \
     .join(Asset, Employee.id == Asset.employee_id) \
     .join(Stock, Asset.stock_id == Stock.id)  \
@@ -151,7 +152,7 @@ def getUser(fullname):
         if resolved_emp_details:
             # Group data by employee name
             emp_details = {}
-            for emp_name, asset_name, category, asset_tag, serial_number, replacement_no in resolved_emp_details:
+            for emp_name, asset_name, category, asset_tag, serial_number, replacement_no, asset_id in resolved_emp_details:
                 if emp_name not in emp_details:
                     emp_details[emp_name] = []
                 emp_details[emp_name].append({
@@ -159,8 +160,11 @@ def getUser(fullname):
                     'category': category,
                     'asset_tag': asset_tag,
                     'serial_number': serial_number,
-                    'replacement_no': replacement_no
+                    'replacement_no': replacement_no,
+                    'asset_id': asset_id
                 })
+
+                ic(emp_details)
 
             return render_template("view_user.html", emp_details=emp_details)
         else:
@@ -192,6 +196,8 @@ def view():
         if emp_id not in emp_id_assets:
             emp_id_assets[emp_id] = []
         emp_id_assets[emp_id].append(da.id)
+
+
     # Combine queries with joins and filtering
     # resolved_emp_details = db.session.query(
     #     Employee.full_name,
@@ -439,7 +445,33 @@ def assign_update():
 
     return render_template('assign-update.html')
     
+@app.route("/replace_asset/<asset_id>", methods=['GET', 'POST'])
+def replace_asset(asset_id):
 
+    msg = ""
+
+    form = assignAsset()
+
+    stock_det = Stock.query.filter_by(id=asset_id).first()
+
+    # Get all assets that are not unassigned that matches the 
+    # category to be replaced.
+    all_stocks_query = f"""
+    SELECT * FROM stock
+    WHERE id NOT IN (
+    SELECT stock_id FROM asset
+    ) AND category = '{stock_det.category}';
+    """
+
+    stocks_not_in_asset = db.session.execute(text(all_stocks_query)).fetchall()
+
+    if not stocks_not_in_asset:
+
+        msg = "No unassigned assets found."
+    else:
+        form.id.choices = [(str(row[0]), str(row[0])) for row in stocks_not_in_asset]
+
+    return render_template("replace_asset.html", form=form, msg=msg, stocks=stocks_not_in_asset, stock_det=stock_det)
 
 # ----------------- NO CHANGES NEEDED PROBABLY  DOWN HERE-----------------
 # ----------------- LOGIN, HOME, LOGOUT ------------------
@@ -479,7 +511,6 @@ def home():
 def logout():
     logout_user()
     return redirect(url_for("index"))
-
 
 @login_manager.user_loader
 def load_user(user_id):

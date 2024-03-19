@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orkestra Inventory System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://kit.fontawesome.com/2b2dc93b33.js" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href=
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
 </head>
 
@@ -40,6 +39,7 @@
                         <th rowspan="2">Asset Tag</th>
                         <th rowspan="2">Serial Number</th>
                         <th rowspan="2">Replacement No</th>
+                        <th rowspan="2">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,6 +52,11 @@
                         <td>{{ asset['asset_tag'] }}</td>
                         <td>{{ asset['serial_number'] }}</td>
                         <td>{{ asset['replacement_no'] }}</td>
+                        <td>
+                           
+                            <a href="{{ url_for('replace_asset', asset_id=asset['asset_id']) }}"><i class="fa-solid fa-pen"></i>
+                            </a>
+                        </td>
                         </tr>
                         {% endfor %}
                     </tr>
@@ -73,7 +78,9 @@
 
                 {% else %}
 
-                {{ error }}
+                
+
+                <a href="">Transfer To</a>
 
                 {% endif %}
     
