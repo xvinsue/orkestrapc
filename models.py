@@ -16,6 +16,7 @@ class Asset(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     stock_id = db.Column(db.Integer, db.ForeignKey('stock.id'))
     employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
+    replacement_no = db.Column(db.Integer, nullable=True)
     date_assigned = db.Column(db.Text)
 
 
@@ -36,17 +37,5 @@ class Employee(db.Model):
     role = db.Column(db.Text)
 
 
-class ReplaceNo(db.Model):
-    __tablename__ = "replaceNo"
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    replacement_no = db.Column(db.Integer, nullable=True, default=0)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    stock_id = db.Column(db.Integer, db.ForeignKey('stock.id'))
-
-
-
 def create_database():
     db.create_all()
-
-
-

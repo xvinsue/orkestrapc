@@ -28,7 +28,8 @@
     <section class="viewHeader">
         <h1>Orkestra Inventory Systsem</h1>
     </section>
-          
+    <div class="view">
+        
     <div class="table-container">
         <section class="viewTable">
             <table>
@@ -63,17 +64,30 @@
     </div>
     
     
-                {% if error and no_assets_flag %}
+            <!-- totals -->
+            {% if number_of_assets %}
+            <div class="viewCategory">
+              <label for="pill-input">Total Assets:</label>
+              <span class="pill-input" style="font-size: 3.5rem;">{{ number_of_assets|length }}</span>
+              <span class="">Number</span>
+            </div>
+          {% else %}
+          <div>
+            <span class="pill-input">No assets found.</span>
+          </div>
+          {% endif %}
+            <div></div>
+            <div class="viewAgent">
+                <label for="pill-input">Total Agents:</label>
+                <span class="pill-input" style="font-size: 3.5rem;">{{ agents }}</span>
+              <span class="pill-input">Number</span>
+
+            </div>
+       
+
+                {% if error %}
 
                 <p>{{ error }}</p>
-                <a href="{{ url_for('assign_asset') }}" id="add-asset-btn">Add Asset</a>
-
-                {% elif error %}
-                <p>{{ error }}</p>
-
-                {% else %}
-
-                {{ error }}
 
                 {% endif %}
     
