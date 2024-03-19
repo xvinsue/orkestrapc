@@ -35,7 +35,7 @@ class Employee(db.Model):
     # accountability_path = db.Column(db.Text)
     role = db.Column(db.Text)
 
-
+##
 class ReplaceNo(db.Model):
     __tablename__ = "replaceNo"
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
