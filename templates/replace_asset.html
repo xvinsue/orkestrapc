@@ -12,6 +12,10 @@
       margin-bottom: 10px;
     }
 
+    thead tr th {
+    position: sticky;  top: 0;
+  }
+
     
   </style>
 </head>
@@ -52,7 +56,7 @@
               <th scope="col">Serial Number</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody style="overflow-y: auto; height: 300px;">
             {% for stock in stocks %}
             <tr>
               <th scope="row">{{ stock.id }}</th>
@@ -60,21 +64,36 @@
               <td>{{ stock.category }}</td>
               <td>{{ stock.asset_tag }}</td>
               <td>{{ stock.serial_number }}</td>
-              <td>
-                <a href="{{ url_for('delete_asset', asset_id=stock.id) }}" class="confirmation">  <i class="fa-solid fa-trash"></i>
-                </a>
-                &nbsp;
-                <a href="{{ url_for('asset_update', num=stock.id) }}">
-                    <i class="fa-solid fa-pencil"></i>
-                  </a>
-              </td>
-              
             </tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
     </td>
+
+    <div class="div">
+        <p>Select asset number to be replaced</p>
+
+        <form action="{{ url_for('assign_asset_controller') }}" method="POST">
+
+            {{ form.id.label }}
+            {{ form.id() }}
+    
+            <input type="submit" value="Replace" id="submitButton" onclick="return confirmReplace()">
+    
+          </form>
+
+
+        <p>Asset to be replaced:</p>
+        <ul>
+            <li>{{ stock_det.name }}</li>
+            <li>{{ stock_det.category }}</li>
+            <li>{{ stock_det.asset_tag }}</li>
+            <li>{{ stock_det.serial_number }}</li>
+        </ul>
+
+    </div>
+
       
 
   
@@ -115,14 +134,13 @@ function myFunction() {
         </script>
 
 <script type="text/javascript">
-    var elems = document.getElementsByClassName('confirmation');
-    var confirmIt = function (e) {
-        if (!confirm('Are you sure you want to delete this?')) e.preventDefault();
-    };
-    for (var i = 0, l = elems.length; i < l; i++) {
-        elems[i].addEventListener('click', confirmIt, false);
-    }
+   function confirmReplace() {
+    // Display confirmation message
+    return confirm("Are you sure you want to replace this item? NOTE: The item to be replaced will go back to the Inventory");
+}
+
 </script>
+
 
 
 

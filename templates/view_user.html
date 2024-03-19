@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orkestra Inventory System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="https://kit.fontawesome.com/2b2dc93b33.js" crossorigin="anonymous"></script>
 
-    <link rel="stylesheet" href=
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
 </head>
 
@@ -28,8 +27,7 @@
     <section class="viewHeader">
         <h1>Orkestra Inventory Systsem</h1>
     </section>
-    <div class="view">
-        
+          
     <div class="table-container">
         <section class="viewTable">
             <table>
@@ -41,6 +39,7 @@
                         <th rowspan="2">Asset Tag</th>
                         <th rowspan="2">Serial Number</th>
                         <th rowspan="2">Replacement No</th>
+                        <th rowspan="2">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -53,6 +52,11 @@
                         <td>{{ asset['asset_tag'] }}</td>
                         <td>{{ asset['serial_number'] }}</td>
                         <td>{{ asset['replacement_no'] }}</td>
+                        <td>
+                           
+                            <a href="{{ url_for('replace_asset', asset_id=asset['asset_id']) }}"><i class="fa-solid fa-pen"></i>
+                            </a>
+                        </td>
                         </tr>
                         {% endfor %}
                     </tr>
@@ -64,30 +68,19 @@
     </div>
     
     
-            <!-- totals -->
-            {% if number_of_assets %}
-            <div class="viewCategory">
-              <label for="pill-input">Total Assets:</label>
-              <span class="pill-input" style="font-size: 3.5rem;">{{ number_of_assets|length }}</span>
-              <span class="">Number</span>
-            </div>
-          {% else %}
-          <div>
-            <span class="pill-input">No assets found.</span>
-          </div>
-          {% endif %}
-            <div></div>
-            <div class="viewAgent">
-                <label for="pill-input">Total Agents:</label>
-                <span class="pill-input" style="font-size: 3.5rem;">{{ agents }}</span>
-              <span class="pill-input">Number</span>
-
-            </div>
-       
-
-                {% if error %}
+                {% if error and no_assets_flag %}
 
                 <p>{{ error }}</p>
+                <a href="{{ url_for('assign_asset') }}" id="add-asset-btn">Add Asset</a>
+
+                {% elif error %}
+                <p>{{ error }}</p>
+
+                {% else %}
+
+                
+
+                <a href="">Transfer To</a>
 
                 {% endif %}
     
