@@ -45,7 +45,7 @@
                 <tbody>
                     {% for emp_name, asset_list in emp_details.items() %}
                     <tr>
-                        <td rowspan="{{ asset_list|length }}"><a href="{{ url_for('getUser', fullname=employee['full_name']) }}">
+                        <td rowspan="{{ asset_list|length }}"><a href="{{ url_for('getUser', fullname=emp_name) }}">
                             {{ emp_name }}
                         </a></td>
                         {% for asset in asset_list %}
