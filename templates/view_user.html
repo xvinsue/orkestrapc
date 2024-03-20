@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +7,6 @@
     <title>Orkestra Inventory System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="https://kit.fontawesome.com/2b2dc93b33.js" crossorigin="anonymous"></script>
-
     </head>
 </head>
 
@@ -16,9 +16,9 @@
          <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
          <div class="nav-links">
             <ul>
-                <li><a href="{{ url_for('home') }}">Home</a></li>
-                <li><a href="{{ url_for('search') }}">Agents</a></li>
-                <li><a href="{{ url_for('asset_view') }}">Peripherals</a></li>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Agents</a></li>
+                <li><a href="#">Peripherals</a></li>
                 <li><a href="{{ url_for('login') }}">Logout</a></li>
             </ul>   
         </div>
@@ -27,6 +27,17 @@
     <section class="viewHeader">
         <h1>Orkestra Inventory Systsem</h1>
     </section>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class=flashes>
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+              <strong> {{ messages[0] }}</strong> 
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+      </ul>
+    {% endif %}
+  {% endwith %}
           
     <div class="table-container">
         <section class="viewTable">
@@ -38,7 +49,7 @@
                         <th rowspan="2">Category</th>
                         <th rowspan="2">Asset Tag</th>
                         <th rowspan="2">Serial Number</th>
-                        <th rowspan="2">Replacement No</th>
+                        <th rowspan="2">Replacement Count</th>
                         <th rowspan="2">Action</th>
                     </tr>
                 </thead>
@@ -51,10 +62,10 @@
                         <td>{{ asset['category'] }}</td>
                         <td>{{ asset['asset_tag'] }}</td>
                         <td>{{ asset['serial_number'] }}</td>
-                        <td>{{ asset['replacement_no'] }}</td>
+                        <td>{{ asset['Replace_No'] }}</td>
                         <td>
                            
-                            <a href="{{ url_for('replace_asset', asset_id=asset['asset_id']) }}"><i class="fa-solid fa-pen"></i>
+                            <a href="{{ url_for('replace_asset', asset_id=asset['asset_id'], fn=emp_name) }}"><i class="fa-solid fa-pen"></i>
                             </a>
                         </td>
                         </tr>
@@ -67,23 +78,24 @@
         </section>
     </div>
     
-    
-                {% if error and no_assets_flag %}
+    <div>
+        {% if error and no_assets_flag %}
 
-                <p>{{ error }}</p>
-                <a href="{{ url_for('assign_asset') }}" id="add-asset-btn">Add Asset</a>
+        <p>{{ error }}</p>
+        <a href="{{ url_for('assign_asset') }}" id="add-asset-btn">Add Asset</a>
 
-                {% elif error %}
-                <p>{{ error }}</p>
+        {% elif error %}
+        <p>{{ error }}</p>
 
-                {% else %}
+        {% else %}
 
-                
+        
+        <form method="POST" action="" ></form>
+        {{ form.names.label }}
+        {{ form.names }}
+        <input type="submit" value="Assign to this agent!">
 
-                <a href="">Transfer To</a>
-
-                {% endif %}
-    
-    
+        {% endif %}
+    </div>
 </body>
 </html>

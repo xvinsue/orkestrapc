@@ -2,9 +2,9 @@ from flask import Flask, render_template, request, jsonify, url_for, send_from_d
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from icecream import ic
-from form import LoginForm, addAsset, assignAsset
+from form import LoginForm, addAsset, assignAsset, UnassignedAgents
 import hashlib
-from models import db, User, Asset, Employee, Stock
+from models import db, User, Asset, Employee, Stock, ReplaceNo
 from sqlalchemy import cast, text
 from datetime import datetime
 
@@ -19,6 +19,8 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 db.init_app(app)
+
+with app.app_context(): db.create_all()
 
 current_date = datetime.now()
 formatted_date = current_date.strftime('%d/%m/%Y')
@@ -124,21 +126,42 @@ def getUser(fullname):
 
     error = ""
 
+    form = UnassignedAgents()
+
     if fullname:
+
         resolved_emp_details = db.session.query(
         Employee.full_name,
         Stock.name.label('asset_name'),
         Stock.category,
         Stock.asset_tag,
         Stock.serial_number,
-        Asset.replacement_no
+        Asset.id.label('asset_id')
     ) \
     .join(Asset, Employee.id == Asset.employee_id) \
-    .join(Stock, Asset.stock_id == Stock.id)
+    .join(Stock, Asset.stock_id == Stock.id) 
 
 
         resolved_emp_details = resolved_emp_details.filter(Employee.full_name == fullname)
 
+        # Use the user_id to query all stock_id in the ReplaceNo table
+        # and then get each category and 
+        # pair them accordingly to the category that matches from the 
+        # resolved_emp_details object.
+
+        employee = Employee.query.filter_by(full_name=fullname).first()
+
+        user_id = employee.id
+
+        stock_id_in_replaceNo = ReplaceNo.query.filter_by(employee_id=user_id).all()
+
+        categories = {}
+
+        for stock in stock_id_in_replaceNo:
+            stockTable = Stock.query.filter_by(id=stock.stock_id).first()
+            categories[stockTable.category] = stock.replacement_no 
+            
+       
         resolved_emp_details = resolved_emp_details.filter(Employee.id != None) \
             .order_by(Employee.full_name, Asset.id) \
             .all()
@@ -146,22 +169,43 @@ def getUser(fullname):
         if resolved_emp_details:
             # Group data by employee name
             emp_details = {}
-            for emp_name, asset_name, category, asset_tag, serial_number, replacement_no in resolved_emp_details:
+            for emp_name, asset_name, category, asset_tag, serial_number, asset_id in resolved_emp_details:
                 if emp_name not in emp_details:
                     emp_details[emp_name] = []
-                emp_details[emp_name].append({
-                    'name': asset_name,
-                    'category': category,
-                    'asset_tag': asset_tag,
-                    'serial_number': serial_number,
-                    'replacement_no': replacement_no
-                })
-            number_of_assets = numOfAssets() 
-            agents = total_agents()
-            return render_template("view_user.html", agents=agents, number_of_assets=number_of_assets, emp_details=emp_details)
+
+         
+                asset_info = {
+                'name': asset_name,
+                'category': category,
+                'asset_tag': asset_tag,
+                'serial_number': serial_number,
+                'asset_id': asset_id
+                }
+
+                all_unassigned_query = """
+                        SELECT * FROM employee
+                        WHERE id NOT IN (
+                        SELECT employee_id FROM asset
+                        );
+                """
+
+                empty_agents = db.session.execute(text(all_unassigned_query))
+
+                form.names.choices = [(str(row[0]), str(row[1])) for row in empty_agents]
+
+
+                # Check for category match and append Replace_No:
+                if category in categories:
+                    asset_info['Replace_No'] = categories[category]
+
+                emp_details[emp_name].append(asset_info) 
+                
+
+            return render_template("view_user.html", emp_details=emp_details, form=form)
         else:
+            no_assets_flag = True
             error = f"No asset yet assigned to agent {fullname}"
-            return render_template("view_user.html",  emp_details={}, error=error)
+            return render_template("view_user.html", no_assets_flag=no_assets_flag , emp_details={}, error=error)
     else:
         error = f"No fullname was provided"
         return render_template("view_user.html",  emp_details={}, error=error)
@@ -187,18 +231,36 @@ def view():
         if emp_id not in emp_id_assets:
             emp_id_assets[emp_id] = []
         emp_id_assets[emp_id].append(da.id)
+
+
     # Combine queries with joins and filtering
+    # resolved_emp_details = db.session.query(
+    #     Employee.full_name,
+    #     Stock.name.label('asset_name'),
+    #     Stock.category,
+    #     Stock.asset_tag,
+    #     Stock.serial_number,
+    #     ReplaceNo.replacement_no
+    # ) \
+    # .join(Asset, Employee.id == Asset.employee_id) \
+    # .join(Stock, Asset.stock_id == Stock.id) \
+    # .filter(Employee.id != None) \
+    # .order_by(Employee.full_name, Asset.id) \
+    # .all()
+        
     resolved_emp_details = db.session.query(
-        Employee.full_name,
-        Stock.name.label('asset_name'),
-        Stock.category,
-        Stock.asset_tag,
-        Stock.serial_number,
-        Asset.replacement_no
+    Employee.full_name,
+    Stock.name.label('asset_name'),
+    Stock.category,
+    Stock.asset_tag,
+    Stock.serial_number,
+    db.func.count(ReplaceNo.replacement_no).label('replacement_count')
     ) \
     .join(Asset, Employee.id == Asset.employee_id) \
     .join(Stock, Asset.stock_id == Stock.id) \
+    .outerjoin(ReplaceNo, Asset.id == ReplaceNo.stock_id) \
     .filter(Employee.id != None) \
+    .group_by(Employee.full_name, Stock.id) \
     .order_by(Employee.full_name, Asset.id) \
     .all()
 
@@ -335,36 +397,6 @@ def get_select_options():
     return jsonify(options)
 
 
-# @app.route("/assign-asset", methods=['GET', 'POST'])
-# @login_required
-# def assign_asset():
-
-#     form = assignAsset()
-
-#     all_stocks_query = """
-#     SELECT * FROM stock
-#     WHERE id NOT IN (
-#     SELECT stock_id FROM asset
-#     );
-#     """
-#     stocks_not_in_asset = db.session.execute(text(all_stocks_query))
-
-#     if not stocks_not_in_asset:
-
-#         msg = "No unassigned assets found."
-
-#     if request.method == 'POST':
-
-#         # Loop through the number of fields
-#         num_fields = int(request.form.get('num_fields'))
-#         for i in range(1, num_fields + 1):  
-#             item = request.form.get('name-' + str(i))
-#             item2 = request.form.get('cat-' + str(i))
-#             ic(item)
-#             ic(item2)
-      #
-#     return render_template('assign-asset copy.html', form=form)
-
 @app.route("/get_categories", methods=['POST', 'GET'])
 def get_categories():
   
@@ -423,11 +455,14 @@ def assign_asset_controller():
 
     if user_id:
 
-        me = Asset(stock_id=id, employee_id=user_id.id, replacement_no=0, date_assigned=formatted_date)
+        asset = Asset(stock_id=id, employee_id=user_id.id, date_assigned=formatted_date)
+        db.session.add(asset)
 
-        db.session.add(me)
+        replacement_record = ReplaceNo(stock_id=id, employee_id=user_id.id, replacement_no=0)
+        db.session.add(replacement_record)
 
         db.session.commit()
+
 
         msg = "Asset assigned successfully!"
         flash(msg, 'success')
@@ -444,7 +479,72 @@ def assign_asset_controller():
 def assign_update():
 
     return render_template('assign-update.html')
+
+@app.route("/replace_asset/<fn>/<asset_id>", methods=['GET', 'POST'])
+def replace_asset(fn, asset_id):
+
+    msg = ""
+
+    form = assignAsset()
+
+    stock_det = Stock.query.filter_by(id=asset_id).first()
+
+    # Get all assets that are not unassigned that matches the 
+    # category to be replaced.
+    all_stocks_query = f"""
+    SELECT * FROM stock
+    WHERE id NOT IN (
+    SELECT stock_id FROM asset
+    ) AND category = '{stock_det.category}';
+    """
+
+    stocks_not_in_asset = db.session.execute(text(all_stocks_query)).fetchall()
+
+    if not stocks_not_in_asset:
+
+        msg = "No unassigned assets found."
+    else:
+        form.id.choices = [(str(row[0]), str(row[0])) for row in stocks_not_in_asset]
+
+    return render_template("replace_asset.html", form=form, msg=msg, stocks=stocks_not_in_asset, stock_det=stock_det, fn=fn)
+
+@app.route("/replace_asset_controller", methods=['POST', 'GET'])
+def replace_controller():
+
     
+    if request.method == 'POST':
+
+        old_id = request.form.get('old_id')
+        full_name= request.form.get('fullname')
+        asset_id = request.form.get('id')
+
+        replaceNo = ReplaceNo.query.filter_by(stock_id=old_id).first()
+
+        if replaceNo:
+            replaceNo.replacement_no += 1
+            db.session.commit()
+
+        employee = Employee.query.filter_by(full_name=full_name).first()
+
+        if employee:
+            # Use employee ID and old ID for asset to be remove and replace with the
+            # asset_id to be replaced.
+            asset = Asset(stock_id=asset_id, employee_id=employee.id, date_assigned=current_date)
+            db.session.add(asset)
+
+            asset_to_delete = Asset.query.filter_by(stock_id=old_id, employee_id=employee.id).first()
+
+            if asset_to_delete:
+                db.session.delete(asset_to_delete)
+                db.session.commit()
+            else:
+                flash("Asset to delete not found")
+        else:
+            flash("Employee not found!!")
+
+
+        return redirect(url_for('getUser', fullname=full_name))
+
 
 
 # ----------------- NO CHANGES NEEDED PROBABLY  DOWN HERE-----------------
@@ -466,7 +566,7 @@ def login():
         ic(is_user_exists)
         if is_user_exists:
             login_user(is_user_exists, remember=True)
-            return redirect(url_for("home"))
+            return redirect(url_for("view"))
 
         else:
 
@@ -485,7 +585,6 @@ def home():
 def logout():
     logout_user()
     return redirect(url_for("index"))
-
 
 @login_manager.user_loader
 def load_user(user_id):
