@@ -17,7 +17,7 @@
          <div class="nav-links">
             <ul>
                 <li><a href="{{ url_for('home') }}">Home</a></li>
-                <li><a href="{{ url_for('search') }}">Agents</a></li>
+                <li><a href="{{ url_for('view') }}">Agents</a></li>
                 <li><a href="{{ url_for('asset_view') }}">Peripherals</a></li>
                 <li><a href="{{ url_for('login') }}">Logout</a></li>
             </ul>   
@@ -78,14 +78,16 @@
             <span class="pill-input">No assets found.</span>
           </div>
           {% endif %}
-            <div></div>
+          <div class="viewSearch">
+            <a href="{{ url_for('search') }}">Search Employees</a>
+          </div>
             <div class="viewAgent">
                 <label for="pill-input">Total Agents:</label>
                 <span class="pill-input" style="font-size: 3.5rem;">{{ agents }}</span>
               <span class="pill-input">Number</span>
 
             </div>
-       
+            
 
                 {% if error %}
 

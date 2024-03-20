@@ -448,6 +448,7 @@ form h1{
     border-radius: 20px;
     height: 240px;
     width: 100%;
+    box-shadow: 0 .4rem .8rem #0005;
 }
 .viewCategory label{
     margin-bottom: 20px;
@@ -457,6 +458,25 @@ form h1{
 .viewCategory span{
     font-weight: thin;
     font-size: 15px;
+}
+.viewSearch{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin: auto;
+    background: #F6921E;
+    border-radius: 20px;
+    height: 100px;
+    width: 30%;
+    box-shadow: 0 .4rem .8rem #0005;
+}
+.viewSearch a{
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 30px;
+    color: #2E2E2E;
+    padding: 20px;
 }
 .viewAgent{
     display: flex;
@@ -471,6 +491,7 @@ form h1{
     border-radius: 20px;
     height: 260px;
     width: 100%;
+    box-shadow: 0 .4rem .8rem #0005;
 }
 .viewAgent label{
     margin-bottom: 30px;
@@ -507,4 +528,54 @@ form h1{
 }
 .assetTable tbody{
     color: white;
+}
+
+/* ADD ASSET */
+.addAsset{
+    margin: auto;
+    margin-top: 70px;
+    background: #F6921E;
+    width: 20%;
+    height: 50%;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
+.addAsset form{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2E2E2E;
+    flex-direction: column;
+}
+.addAsset label{
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+.addAsset input{
+    padding: 8px 15px;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+.addAsset select{
+    padding: 8px 15px;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+.addAsset .buttonAdd{
+    margin-top: 10px;
+}
+.addAsset p{
+    padding: 10px;
+    background-color: black;
+    color: #F6921E;
+    width: 60%;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    border-radius: 10px;
 }
