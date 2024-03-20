@@ -27,6 +27,17 @@
     <section class="viewHeader">
         <h1>Orkestra Inventory Systsem</h1>
     </section>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class=flashes>
+          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+              <strong> {{ messages[0] }}</strong> 
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+      </ul>
+    {% endif %}
+  {% endwith %}
           
     <div class="table-container">
         <section class="viewTable">
@@ -38,7 +49,7 @@
                         <th rowspan="2">Category</th>
                         <th rowspan="2">Asset Tag</th>
                         <th rowspan="2">Serial Number</th>
-                        <th rowspan="2">Replacement No</th>
+                        <th rowspan="2">Replacement Count</th>
                         <th rowspan="2">Action</th>
                     </tr>
                 </thead>
@@ -51,10 +62,10 @@
                         <td>{{ asset['category'] }}</td>
                         <td>{{ asset['asset_tag'] }}</td>
                         <td>{{ asset['serial_number'] }}</td>
-                        <td>{{ asset['replacement_no'] }}</td>
+                        <td>{{ asset['Replace_No'] }}</td>
                         <td>
                            
-                            <a href="{{ url_for('replace_asset', asset_id=asset['asset_id']) }}"><i class="fa-solid fa-pen"></i>
+                            <a href="{{ url_for('replace_asset', asset_id=asset['asset_id'], fn=emp_name) }}"><i class="fa-solid fa-pen"></i>
                             </a>
                         </td>
                         </tr>

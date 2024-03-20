@@ -134,16 +134,32 @@ def getUser(fullname):
         Stock.category,
         Stock.asset_tag,
         Stock.serial_number,
-        ReplaceNo.replacement_no,
         Asset.id.label('asset_id')
     ) \
     .join(Asset, Employee.id == Asset.employee_id) \
-    .join(Stock, Asset.stock_id == Stock.id)  \
-    .join(ReplaceNo, Asset.stock_id == ReplaceNo.stock_id)
+    .join(Stock, Asset.stock_id == Stock.id) 
 
 
         resolved_emp_details = resolved_emp_details.filter(Employee.full_name == fullname)
 
+        # Use the user_id to query all stock_id in the ReplaceNo table
+        # and then get each category and 
+        # pair them accordingly to the category that matches from the 
+        # resolved_emp_details object.
+
+        employee = Employee.query.filter_by(full_name=fullname).first()
+
+        user_id = employee.id
+
+        stock_id_in_replaceNo = ReplaceNo.query.filter_by(employee_id=user_id).all()
+
+        categories = {}
+
+        for stock in stock_id_in_replaceNo:
+            stockTable = Stock.query.filter_by(id=stock.stock_id).first()
+            categories[stockTable.category] = stock.replacement_no 
+            
+        ic(categories)
         resolved_emp_details = resolved_emp_details.filter(Employee.id != None) \
             .order_by(Employee.full_name, Asset.id) \
             .all()
@@ -151,18 +167,31 @@ def getUser(fullname):
         if resolved_emp_details:
             # Group data by employee name
             emp_details = {}
-            for emp_name, asset_name, category, asset_tag, serial_number, replacement_no, asset_id in resolved_emp_details:
+            for emp_name, asset_name, category, asset_tag, serial_number, asset_id in resolved_emp_details:
                 if emp_name not in emp_details:
                     emp_details[emp_name] = []
-                emp_details[emp_name].append({
-                    'name': asset_name,
-                    'category': category,
-                    'asset_tag': asset_tag,
-                    'serial_number': serial_number,
-                    'replacement_no': replacement_no,
-                    'asset_id': asset_id
-                })
 
+                # emp_details[emp_name].append({
+                #     'name': asset_name,
+                #     'category': category,
+                #     'asset_tag': asset_tag,
+                #     'serial_number': serial_number,
+                #     'asset_id': asset_id
+                # })
+                
+                asset_info = {
+                'name': asset_name,
+                'category': category,
+                'asset_tag': asset_tag,
+                'serial_number': serial_number,
+                'asset_id': asset_id
+                }
+
+                # Check for category match and append Replace_No:
+                if category in categories:
+                    asset_info['Replace_No'] = categories[category]
+
+                emp_details[emp_name].append(asset_info) 
                 ic(emp_details)
 
             return render_template("view_user.html", emp_details=emp_details)
@@ -444,9 +473,8 @@ def assign_update():
 
     return render_template('assign-update.html')
 
-##
-@app.route("/replace_asset/<asset_id>", methods=['GET', 'POST'])
-def replace_asset(asset_id):
+@app.route("/replace_asset/<fn>/<asset_id>", methods=['GET', 'POST'])
+def replace_asset(fn, asset_id):
 
     msg = ""
 
@@ -471,7 +499,46 @@ def replace_asset(asset_id):
     else:
         form.id.choices = [(str(row[0]), str(row[0])) for row in stocks_not_in_asset]
 
-    return render_template("replace_asset.html", form=form, msg=msg, stocks=stocks_not_in_asset, stock_det=stock_det)
+    return render_template("replace_asset.html", form=form, msg=msg, stocks=stocks_not_in_asset, stock_det=stock_det, fn=fn)
+
+@app.route("/replace_asset_controller", methods=['POST', 'GET'])
+def replace_controller():
+
+    
+    if request.method == 'POST':
+
+        old_id = request.form.get('old_id')
+        full_name= request.form.get('fullname')
+        asset_id = request.form.get('id')
+
+        replaceNo = ReplaceNo.query.filter_by(stock_id=old_id).first()
+
+        if replaceNo:
+            replaceNo.replacement_no += 1
+            db.session.commit()
+
+        employee = Employee.query.filter_by(full_name=full_name).first()
+
+        if employee:
+            # Use employee ID and old ID for asset to be remove and replace with the
+            # asset_id to be replaced.
+            asset = Asset(stock_id=asset_id, employee_id=employee.id, date_assigned=current_date)
+            db.session.add(asset)
+
+            asset_to_delete = Asset.query.filter_by(stock_id=old_id, employee_id=employee.id).first()
+
+            if asset_to_delete:
+                db.session.delete(asset_to_delete)
+                db.session.commit()
+            else:
+                flash("Asset to delete not found")
+        else:
+            flash("Employee not found!!")
+
+
+        return redirect(url_for('getUser', fullname=full_name))
+
+
 
 # ----------------- NO CHANGES NEEDED PROBABLY  DOWN HERE-----------------
 # ----------------- LOGIN, HOME, LOGOUT ------------------
