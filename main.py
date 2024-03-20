@@ -161,7 +161,7 @@ def getUser(fullname):
             stockTable = Stock.query.filter_by(id=stock.stock_id).first()
             categories[stockTable.category] = stock.replacement_no 
             
-       
+        ic(categories)
         resolved_emp_details = resolved_emp_details.filter(Employee.id != None) \
             .order_by(Employee.full_name, Asset.id) \
             .all()
@@ -173,7 +173,14 @@ def getUser(fullname):
                 if emp_name not in emp_details:
                     emp_details[emp_name] = []
 
-         
+                # emp_details[emp_name].append({
+                #     'name': asset_name,
+                #     'category': category,
+                #     'asset_tag': asset_tag,
+                #     'serial_number': serial_number,
+                #     'asset_id': asset_id
+                # })
+                
                 asset_info = {
                 'name': asset_name,
                 'category': category,
@@ -182,24 +189,12 @@ def getUser(fullname):
                 'asset_id': asset_id
                 }
 
-                all_unassigned_query = """
-                        SELECT * FROM employee
-                        WHERE id NOT IN (
-                        SELECT employee_id FROM asset
-                        );
-                """
-
-                empty_agents = db.session.execute(text(all_unassigned_query))
-
-                form.names.choices = [(str(row[0]), str(row[1])) for row in empty_agents]
-
-
                 # Check for category match and append Replace_No:
                 if category in categories:
                     asset_info['Replace_No'] = categories[category]
 
                 emp_details[emp_name].append(asset_info) 
-                
+                ic(emp_details)
 
             return render_template("view_user.html", emp_details=emp_details, form=form)
         else:
