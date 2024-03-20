@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orkestra Inventory System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <script src="https://kit.fontawesome.com/2b2dc93b33.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/view_user.css') }}">
 
+    <script src="https://kit.fontawesome.com/2b2dc93b33.js" crossorigin="anonymous"></script>
     </head>
 </head>
 
@@ -27,6 +28,15 @@
     <section class="viewHeader">
         <h1>Orkestra Inventory Systsem</h1>
     </section>
+
+    {% with messages = get_flashed_messages() %}
+  {% if messages %}
+      <div class='alert alert-{{ category }} messages' id='div_flash' >
+        {{ message }}
+        <input type='button' value=&#10006 onclick='hideUnhide()' style='float: right'>
+      </div>
+  {% endif %}
+{% endwith %}
 
     {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -67,6 +77,8 @@
                            
                             <a href="{{ url_for('replace_asset', asset_id=asset['asset_id'], fn=emp_name) }}"><i class="fa-solid fa-pen"></i>
                             </a>
+                            <a href="{{ url_for('return_asset', asset_id=asset['asset_id'], fn=emp_name) }}" class="confirmReturn"><i class="fa-solid fa-trash"></i>
+                            </a>
                         </td>
                         </tr>
                         {% endfor %}
@@ -79,7 +91,7 @@
     </div>
     
     
-                {% if error and no_assets_flag %}
+                <!-- {% if error and no_assets_flag %}
 
                 <p>{{ error }}</p>
                 <a href="{{ url_for('assign_asset') }}" id="add-asset-btn">Add Asset</a>
@@ -90,10 +102,67 @@
                 {% else %}
 
                 
+                <form method="POST" action="" ></form>
+                {{ form.names.label }}
+                {{ form.names }}
+                <input type="submit" value="Assign to this agent!">
 
-                <a href="">Transfer To</a>
+                {% endif %} -->
 
-                {% endif %}
+
+                <div class="container_view">
+                    {% if error and no_assets_flag %}
+                      <div class="error-message">
+                        <p>{{ error }}</p>
+                        <a href="{{ url_for('assign_asset') }}" id="add-asset-btn">Add Asset</a>
+                      </div>
+                    {% elif error %}
+                      <div class="error-message">
+                        <p>{{ error }}</p>
+                      </div>
+                    {% else %}
+                      <form method="POST" action="{{ url_for('replace_all_asset') }}" class="user-form">
+                        {{ form.names.label }}
+                        {{ form.names }}
+                        <input type="hidden" value="{{ fullname }}" name="agentToEmpty">
+                        
+                        <input type="submit" value="Assign to this agent!" class="submit-btn confirmation">
+                      </form>
+                    {% endif %}
+                  </div>
+                  
+                  <script type="text/javascript">
+                    var elems = document.getElementsByClassName('confirmation');
+                    var confirmIt = function (e) {
+                        if (!confirm('Are you sure you want to transfer every asset to this user?')) e.preventDefault();
+                    };
+                    for (var i = 0, l = elems.length; i < l; i++) {
+                        elems[i].addEventListener('click', confirmIt, false);
+                    }
+                </script>
+                
+
+                <script type="text/javascript">
+                    var elems = document.getElementsByClassName('confirmReturn');
+                    var confirmIt = function (e) {
+                        if (!confirm('Take back asset from agent? This will go back to unassigned assets')) e.preventDefault();
+                    };
+                    for (var i = 0, l = elems.length; i < l; i++) {
+                        elems[i].addEventListener('click', confirmIt, false);
+                    }
+                </script>
+
+
+<script>
+    function hideUnhide() {
+      var my_element = document.getElementById('div_flash');
+      if (my_element.style.display === 'none') {
+        my_element.style.display = 'inline';
+      } else {
+        my_element.style.display = 'none';
+      }
+    }
+    </script>
     
     
 </body>

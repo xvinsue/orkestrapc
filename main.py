@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify, url_for, send_from_d
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from icecream import ic
-from form import LoginForm, addAsset, assignAsset
+from form import LoginForm, addAsset, assignAsset, UnassignedAgents
 import hashlib
 from models import db, User, Asset, Employee, Stock, ReplaceNo
 from sqlalchemy import cast, text
@@ -126,6 +126,8 @@ def getUser(fullname):
 
     error = ""
 
+    form = UnassignedAgents()
+
     if fullname:
 
         resolved_emp_details = db.session.query(
@@ -159,7 +161,7 @@ def getUser(fullname):
             stockTable = Stock.query.filter_by(id=stock.stock_id).first()
             categories[stockTable.category] = stock.replacement_no 
             
-        ic(categories)
+       
         resolved_emp_details = resolved_emp_details.filter(Employee.id != None) \
             .order_by(Employee.full_name, Asset.id) \
             .all()
@@ -171,14 +173,7 @@ def getUser(fullname):
                 if emp_name not in emp_details:
                     emp_details[emp_name] = []
 
-                # emp_details[emp_name].append({
-                #     'name': asset_name,
-                #     'category': category,
-                #     'asset_tag': asset_tag,
-                #     'serial_number': serial_number,
-                #     'asset_id': asset_id
-                # })
-                
+         
                 asset_info = {
                 'name': asset_name,
                 'category': category,
@@ -187,14 +182,26 @@ def getUser(fullname):
                 'asset_id': asset_id
                 }
 
+                all_unassigned_query = """
+                        SELECT * FROM employee
+                        WHERE id NOT IN (
+                        SELECT employee_id FROM asset
+                        );
+                """
+
+                empty_agents = db.session.execute(text(all_unassigned_query))
+
+                form.names.choices = [(str(row[0]), str(row[1])) for row in empty_agents]
+
+
                 # Check for category match and append Replace_No:
                 if category in categories:
                     asset_info['Replace_No'] = categories[category]
 
                 emp_details[emp_name].append(asset_info) 
-                ic(emp_details)
-
-            return render_template("view_user.html", emp_details=emp_details)
+                
+            flash("test")
+            return render_template("view_user.html", emp_details=emp_details, form=form, fullname=fullname)
         else:
             no_assets_flag = True
             error = f"No asset yet assigned to agent {fullname}"
@@ -402,9 +409,6 @@ def get_categories():
 
   return jsonify(categories)
 
-# SUGGEST CHANGES GO TO VIEW AND WITH ID
-# SO BASICALLY USER NEEDS TO JUST SIMPLY INPUT ID OF THE ASSET AND THEN WHICH USER
-
 
 @app.route("/assign-asset", methods=['GET', 'POST'])
 @login_required
@@ -538,6 +542,56 @@ def replace_controller():
 
         return redirect(url_for('getUser', fullname=full_name))
 
+@app.route('/replace_all_asset/', methods=['GET', 'POST'])
+def replace_all_asset():
+
+    if request.method == 'POST':
+
+        old_agent = request.form.get('agentToEmpty')
+        new_agent = request.form.get('names')
+
+
+        new_agent = Employee.query.filter_by(id=new_agent).first()
+
+        # Find the old agent using full name:
+        user = Employee.query.filter_by(full_name=old_agent).first()
+
+        if user:  # Check if the old agent exists
+            # Fetch all assets assigned to the old agent:
+            assets_to_update = Asset.query.filter_by(employee_id=user.id).all()
+
+            if assets_to_update:  # Check if there are assets assigned
+                # Update employee_id for all fetched assets:
+                for asset in assets_to_update:
+                    asset.employee_id = new_agent
+
+                # Commit the changes to the database:
+                db.session.commit()
+                # Optional: Success message or action after successful update
+            else:
+                # Handle the case where no assets are found for the old agent
+                error_message = f"No assets found assigned to agent {old_agent}."
+                flash(error_message)
+        else:
+            # Handle the case where the old agent is not found
+            error_message = f"Agent with name '{old_agent}' not found."
+            flash(error_message)
+        
+        return redirect(url_for('getUser', fullname=new_agent.id))
+
+
+@app.route("/return_asset/<asset_id>/<fn>", methods=['GET', 'POST'])
+def return_asset(asset_id, fn):
+
+
+    if request.method == 'GET':
+
+        take_back_asset = Asset.query.filter_by(stock_id=asset_id).first()
+
+        db.session.delete(take_back_asset)
+        db.session.commit()
+
+    return "alex"
 
 
 # ----------------- NO CHANGES NEEDED PROBABLY  DOWN HERE-----------------

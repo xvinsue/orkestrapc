@@ -8,9 +8,6 @@ class LoginForm(FlaskForm):
     username = StringField(label='Username', validators=[DataRequired()])
     password = PasswordField(label='Password', validators=[DataRequired()])
 
-
-
-
 class addAsset(FlaskForm):
 
     name = StringField(label='Brand Name', validators=[DataRequired(), InputRequired()])
@@ -24,3 +21,6 @@ class assignAsset(FlaskForm):
     agent_name = SelectField(label='Assign To:', validators=[DataRequired()])
     
 
+class UnassignedAgents(FlaskForm):
+
+    names = SelectField(label="Agent list", validators=[DataRequired()])
