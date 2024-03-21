@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SelectField, FieldList, IntegerField
-from wtforms.validators import DataRequired, InputRequired
+from wtforms.validators import DataRequired, InputRequired, Length, ValidationError
 
 
 class LoginForm(FlaskForm):
@@ -11,7 +11,7 @@ class LoginForm(FlaskForm):
 class addAsset(FlaskForm):
 
     name = StringField(label='Brand Name', validators=[DataRequired(), InputRequired()])
-    category = SelectField(label='Category', choices=['Mouse', 'Keyboard'])
+    category = SelectField(label='Category', choices=['Mouse', 'Keyboard', 'CPU', 'Monitor', 'Headset', "Camera", "Chair"])
     asset_tag = StringField(label='Asset Tag', validators=[DataRequired()], default="None")
     serial_no = StringField(label='Serial Number', validators=[DataRequired()], default="None")
 
@@ -24,3 +24,18 @@ class assignAsset(FlaskForm):
 class UnassignedAgents(FlaskForm):
 
     names = SelectField(label="Agent list", validators=[DataRequired()])
+
+
+class employeeForm(FlaskForm):
+
+    name = StringField(label="Agent full name", validators=[DataRequired(), Length(min=5)])
+    role = SelectField(label='Category', choices=['MSE', 'SA', 'FSE', 'HR', 'Recruit', 'Intern'])
+
+
+    def validate_name(form, field):
+        excluded_chars = "*?!'^+%&/()=}][{$#123456789"
+        for char in field.data:
+            if char in excluded_chars:
+                raise ValidationError(
+                    f"Character {char} is not allowed in full name.")
+

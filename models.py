@@ -41,7 +41,8 @@ class ReplaceNo(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     replacement_no = db.Column(db.Integer, nullable=True, default=0)
     employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'))
-    stock_id = db.Column(db.Integer, db.ForeignKey('stock.id'))
+    category = db.Column(db.String(30), unique=False, nullable=False)
+
 
 
 

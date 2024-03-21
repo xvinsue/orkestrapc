@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Orkestra Inventory System</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/view_user.css') }}">
+
     <script src="https://kit.fontawesome.com/2b2dc93b33.js" crossorigin="anonymous"></script>
     </head>
 </head>
@@ -29,16 +31,16 @@
     </section>
 
     {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul class=flashes>
-          <div class="alert alert-warning alert-dismissible fade show" role="alert">
-              <strong> {{ messages[0] }}</strong> 
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-      </ul>
-    {% endif %}
-  {% endwith %}
-          
+  {% if messages %}
+
+  <div class="alert">
+    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+    {{ messages[0] }}
+  </div> 
+  {% endif %}
+{% endwith %}
+
+
     <div class="table-container">
         <section class="viewTable">
             <table>
@@ -67,6 +69,8 @@
                            
                             <a href="{{ url_for('replace_asset', asset_id=asset['asset_id'], fn=emp_name) }}"><i class="fa-solid fa-pen"></i>
                             </a>
+                            <a href="{{ url_for('return_asset', asset_id=asset['asset_id'], fn=emp_name) }}" class="confirmReturn"><i class="fa-solid fa-trash"></i>
+                            </a>
                         </td>
                         </tr>
                         {% endfor %}
@@ -78,24 +82,49 @@
         </section>
     </div>
     
-    <div>
-        {% if error and no_assets_flag %}
+                <div class="container_view">
+                    {% if error and no_assets_flag %}
+                      <div class="error-message">
+                        <p>{{ error }}</p>
+                        <a href="{{ url_for('assign_asset') }}" id="add-asset-btn">Add Asset</a>
+                      </div>
+                    {% elif error %}
+                      <div class="error-message">
+                        <p>{{ error }}</p>
+                      </div>
+                    {% else %}
+                      <form method="POST" action="{{ url_for('replace_all_asset') }}" class="user-form">
+                        {{ form.names.label }}
+                        {{ form.names }}
+                        <input type="hidden" value="{{ fullname }}" name="agentToEmpty">
+                        
+                        <input type="submit" value="Assign to this agent!" class="submit-btn confirmation">
+                      </form>
+                    {% endif %}
+                  </div>
+                  
+                  <script type="text/javascript">
+                    var elems = document.getElementsByClassName('confirmation');
+                    var confirmIt = function (e) {
+                        if (!confirm('Are you sure you want to transfer every asset to this user?')) e.preventDefault();
+                    };
+                    for (var i = 0, l = elems.length; i < l; i++) {
+                        elems[i].addEventListener('click', confirmIt, false);
+                    }
+                </script>
+                
 
-        <p>{{ error }}</p>
-        <a href="{{ url_for('assign_asset') }}" id="add-asset-btn">Add Asset</a>
+                <script type="text/javascript">
+                    var elems = document.getElementsByClassName('confirmReturn');
+                    var confirmIt = function (e) {
+                        if (!confirm('Take back asset from agent? This will go back to the inventory')) e.preventDefault();
+                    };
+                    for (var i = 0, l = elems.length; i < l; i++) {
+                        elems[i].addEventListener('click', confirmIt, false);
+                    }
+                </script>
 
-        {% elif error %}
-        <p>{{ error }}</p>
 
-        {% else %}
-
-        
-        <form method="POST" action="" ></form>
-        {{ form.names.label }}
-        {{ form.names }}
-        <input type="submit" value="Assign to this agent!">
-
-        {% endif %}
-    </div>
+    
 </body>
 </html>

@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify, url_for, send_from_d
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from icecream import ic
-from form import LoginForm, addAsset, assignAsset, UnassignedAgents
+from form import LoginForm, addAsset, assignAsset, UnassignedAgents, employeeForm, UnassignedAgents
 import hashlib
 from models import db, User, Asset, Employee, Stock, ReplaceNo
 from sqlalchemy import cast, text
@@ -62,7 +62,7 @@ def total_agents():
 
     if total_agents == 0 :
         
-        return "No employees found"
+        return False
 
     return total_agents
 
@@ -128,6 +128,8 @@ def getUser(fullname):
 
     form = UnassignedAgents()
 
+    form = UnassignedAgents()
+
     if fullname:
 
         resolved_emp_details = db.session.query(
@@ -136,7 +138,7 @@ def getUser(fullname):
         Stock.category,
         Stock.asset_tag,
         Stock.serial_number,
-        Asset.id.label('asset_id')
+        Asset.stock_id.label('asset_id')
     ) \
     .join(Asset, Employee.id == Asset.employee_id) \
     .join(Stock, Asset.stock_id == Stock.id) 
@@ -150,18 +152,15 @@ def getUser(fullname):
         # resolved_emp_details object.
 
         employee = Employee.query.filter_by(full_name=fullname).first()
-
         user_id = employee.id
 
         stock_id_in_replaceNo = ReplaceNo.query.filter_by(employee_id=user_id).all()
-
         categories = {}
 
         for stock in stock_id_in_replaceNo:
-            stockTable = Stock.query.filter_by(id=stock.stock_id).first()
+            stockTable = Stock.query.filter_by(category=stock.category).first()
             categories[stockTable.category] = stock.replacement_no 
             
-        ic(categories)
         resolved_emp_details = resolved_emp_details.filter(Employee.id != None) \
             .order_by(Employee.full_name, Asset.id) \
             .all()
@@ -173,14 +172,7 @@ def getUser(fullname):
                 if emp_name not in emp_details:
                     emp_details[emp_name] = []
 
-                # emp_details[emp_name].append({
-                #     'name': asset_name,
-                #     'category': category,
-                #     'asset_tag': asset_tag,
-                #     'serial_number': serial_number,
-                #     'asset_id': asset_id
-                # })
-                
+         
                 asset_info = {
                 'name': asset_name,
                 'category': category,
@@ -189,20 +181,37 @@ def getUser(fullname):
                 'asset_id': asset_id
                 }
 
+                all_unassigned_query = """
+                        SELECT * FROM employee
+                        WHERE id NOT IN (
+                        SELECT employee_id FROM asset
+                        );
+                """
+
+                empty_agents = db.session.execute(text(all_unassigned_query))
+
+                form.names.choices = [(str(row[0]), str(row[1])) for row in empty_agents]
+
+
                 # Check for category match and append Replace_No:
                 if category in categories:
                     asset_info['Replace_No'] = categories[category]
 
                 emp_details[emp_name].append(asset_info) 
+                
+            
+            return render_template("view_user.html", emp_details=emp_details, form=form, fullname=fullname)
                 ic(emp_details)
 
             return render_template("view_user.html", emp_details=emp_details, form=form)
         else:
             no_assets_flag = True
             error = f"No asset yet assigned to agent {fullname}"
+            flash(error)
             return render_template("view_user.html", no_assets_flag=no_assets_flag , emp_details={}, error=error)
     else:
         error = f"No fullname was provided"
+        flash(error)
         return render_template("view_user.html",  emp_details={}, error=error)
 
 
@@ -227,33 +236,15 @@ def view():
             emp_id_assets[emp_id] = []
         emp_id_assets[emp_id].append(da.id)
 
-
-    # Combine queries with joins and filtering
-    # resolved_emp_details = db.session.query(
-    #     Employee.full_name,
-    #     Stock.name.label('asset_name'),
-    #     Stock.category,
-    #     Stock.asset_tag,
-    #     Stock.serial_number,
-    #     ReplaceNo.replacement_no
-    # ) \
-    # .join(Asset, Employee.id == Asset.employee_id) \
-    # .join(Stock, Asset.stock_id == Stock.id) \
-    # .filter(Employee.id != None) \
-    # .order_by(Employee.full_name, Asset.id) \
-    # .all()
-        
     resolved_emp_details = db.session.query(
     Employee.full_name,
     Stock.name.label('asset_name'),
     Stock.category,
     Stock.asset_tag,
-    Stock.serial_number,
-    db.func.count(ReplaceNo.replacement_no).label('replacement_count')
+    Stock.serial_number
     ) \
     .join(Asset, Employee.id == Asset.employee_id) \
     .join(Stock, Asset.stock_id == Stock.id) \
-    .outerjoin(ReplaceNo, Asset.id == ReplaceNo.stock_id) \
     .filter(Employee.id != None) \
     .group_by(Employee.full_name, Stock.id) \
     .order_by(Employee.full_name, Asset.id) \
@@ -268,15 +259,14 @@ def view():
     agents = total_agents()
 
     if resolved_emp_details:
-        for emp_name, asset_name, category, asset_tag, serial_number, replacement_no in resolved_emp_details:
+        for emp_name, asset_name, category, asset_tag, serial_number in resolved_emp_details:
             if emp_name not in emp_details:
                 emp_details[emp_name] = []
             emp_details[emp_name].append({
                 'name': asset_name,
                 'category': category,
                 'asset_tag': asset_tag,
-                'serial_number': serial_number,
-                'replacement_no': replacement_no
+                'serial_number': serial_number
             })
        
     else:
@@ -379,19 +369,6 @@ def asset_update(num):
     return render_template('update-asset.html', form=form, asset=asset,num=num)
 
 
-# ---------------- EXPERIMENTAL ---------------------
-# Dynamically adding selectField values using AJAX
-@app.route('/get_select_options')
-def get_select_options():
-    # Can be replaced with database instead but for now this is good
-    options = [
-        {'value': 'Keyboard', 'label': 'Keyboard'},
-        {'value': 'Mouse', 'label': 'Option 2'},
-        {'value': 'option3', 'label': 'Option 3'},
-    ]
-    return jsonify(options)
-
-
 @app.route("/get_categories", methods=['POST', 'GET'])
 def get_categories():
   
@@ -403,9 +380,6 @@ def get_categories():
   ic(categories)
 
   return jsonify(categories)
-
-# SUGGEST CHANGES GO TO VIEW AND WITH ID
-# SO BASICALLY USER NEEDS TO JUST SIMPLY INPUT ID OF THE ASSET AND THEN WHICH USER
 
 
 @app.route("/assign-asset", methods=['GET', 'POST'])
@@ -453,7 +427,10 @@ def assign_asset_controller():
         asset = Asset(stock_id=id, employee_id=user_id.id, date_assigned=formatted_date)
         db.session.add(asset)
 
-        replacement_record = ReplaceNo(stock_id=id, employee_id=user_id.id, replacement_no=0)
+        #Get category of asset
+        stock = Stock.query.filter_by(id=id).first()
+
+        replacement_record = ReplaceNo(employee_id=user_id.id, replacement_no=0, category=stock.category)
         db.session.add(replacement_record)
 
         db.session.commit()
@@ -513,7 +490,12 @@ def replace_controller():
         full_name= request.form.get('fullname')
         asset_id = request.form.get('id')
 
-        replaceNo = ReplaceNo.query.filter_by(stock_id=old_id).first()
+
+        # Update the specific entry in the ReplaceNo table
+        # Find the row using category and employee ID and plus + 1 as a counter
+        getEmpName = Employee.query.filter_by(full_name=full_name).first()
+        getCategory = Stock.query.filter_by(id=asset_id).first()
+        replaceNo = ReplaceNo.query.filter_by(employee_id=getEmpName.id, category=getCategory.category).first()
 
         if replaceNo:
             replaceNo.replacement_no += 1
@@ -540,6 +522,75 @@ def replace_controller():
 
         return redirect(url_for('getUser', fullname=full_name))
 
+@app.route('/replace_all_asset/', methods=['GET', 'POST'])
+def replace_all_asset():
+
+    if request.method == 'POST':
+
+        old_agent = request.form.get('agentToEmpty')
+        new_agent = request.form.get('names')
+
+
+        new_agent = Employee.query.filter_by(id=new_agent).first()
+
+        # Find the old agent using full name:
+        user = Employee.query.filter_by(full_name=old_agent).first()
+
+        if user:  # Check if the old agent exists
+            # Fetch all assets assigned to the old agent:
+            assets_to_update = Asset.query.filter_by(employee_id=user.id).all()
+
+            if assets_to_update:  # Check if there are assets assigned
+                # Update employee_id for all fetched assets:
+                for asset in assets_to_update:
+                    asset.employee_id = new_agent.id
+
+                # Commit the changes to the database:
+                db.session.commit()
+
+                # Change th employee_id in the ReplaceNo using the new_agent
+                transfer_replace_count = ReplaceNo.query.filter_by(employee_id=user.id).all()
+
+                if transfer_replace_count:
+                    for transfer in transfer_replace_count:
+
+                        transfer.employee_id = new_agent.id
+                    
+                    db.session.commit()
+                    error_msg = f"Succesfully transferred asset from {old_agent} to {new_agent.full_name}"
+                else:
+                    error_msg = f"No replacement history was found for the old agent {old_agent}"
+                    flash(error_msg)
+            else:
+                # Handle the case where no assets are found for the old agent
+                error_message = f"No assets found assigned to agent {old_agent}."
+                flash(error_message)
+        else:
+            # Handle the case where the old agent is not found
+            error_message = f"Agent with name '{old_agent}' not found."
+            flash(error_message)
+        
+        return redirect(url_for('getUser', fullname=new_agent.full_name))
+
+
+@app.route("/return_asset/<asset_id>/<fn>", methods=['GET', 'POST'])
+def return_asset(fn, asset_id):
+
+    
+    take_back_asset = Asset.query.filter_by(stock_id=asset_id).first()
+    get_asset_detail = Stock.query.filter_by(id=asset_id).first()
+
+    if take_back_asset:
+        asset_name = f"{get_asset_detail.name} with asset tag {get_asset_detail.asset_tag}"
+
+        db.session.delete(take_back_asset)
+        db.session.commit()
+        msg = f"Asset {asset_name} successfully taken back from {fn}!"
+        flash(msg)
+    else:
+        msg = "Asset ID was not found please try again."
+
+    return redirect(url_for('getUser', fullname=fn))
 
 
 # ----------------- NO CHANGES NEEDED PROBABLY  DOWN HERE-----------------
@@ -568,6 +619,35 @@ def login():
             return render_template("login.html", form=form, error="Wrong username or password.")
 
     return render_template("login.html", form=form)
+
+# ---------------- EXPERIMENTAL ---------------------
+# CRUD FOR EMPLOYEE
+@app.route('/add-emp', methods=['GET', 'POST'])
+def add_emp():
+
+    form = employeeForm()
+
+    
+    if form.validate_on_submit():
+
+        name = request.form.get('name')
+        role = request.form.get('role')
+
+        employeeObj = Employee(full_name=name, role=role)
+        db.session.add(employeeObj)
+        db.session.commit()
+
+        msg = "New user added succesfully!"
+        flash(msg)
+
+
+
+    return render_template('add-emp.html', form=form)
+
+@app.route("/view-emp", methods=['GET', 'POST'])
+def view_emp():
+
+    return "alex"
 
 @app.route("/")
 def index():
