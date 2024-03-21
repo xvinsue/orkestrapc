@@ -431,6 +431,10 @@ form h1{
 .viewTable th{
     padding: 20px;
 }
+.viewTable a{
+    text-decoration: none;
+    color: white;
+}
 .viewTable tbody{
     font-size: 15px;
     border: transparent;
