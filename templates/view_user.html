@@ -31,24 +31,15 @@
 
     {% with messages = get_flashed_messages() %}
   {% if messages %}
-      <div class='alert alert-{{ category }} messages' id='div_flash' >
-        {{ message }}
-        <input type='button' value=&#10006 onclick='hideUnhide()' style='float: right'>
-      </div>
+
+  <div class="alert">
+    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+    {{ messages[0] }}
+  </div> 
   {% endif %}
 {% endwith %}
 
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul class=flashes>
-          <div class="alert alert-warning alert-dismissible fade show" role="alert">
-              <strong> {{ messages[0] }}</strong> 
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-      </ul>
-    {% endif %}
-  {% endwith %}
-          
+
     <div class="table-container">
         <section class="viewTable">
             <table>
@@ -90,26 +81,6 @@
         </section>
     </div>
     
-    
-                <!-- {% if error and no_assets_flag %}
-
-                <p>{{ error }}</p>
-                <a href="{{ url_for('assign_asset') }}" id="add-asset-btn">Add Asset</a>
-
-                {% elif error %}
-                <p>{{ error }}</p>
-
-                {% else %}
-
-                
-                <form method="POST" action="" ></form>
-                {{ form.names.label }}
-                {{ form.names }}
-                <input type="submit" value="Assign to this agent!">
-
-                {% endif %} -->
-
-
                 <div class="container_view">
                     {% if error and no_assets_flag %}
                       <div class="error-message">
@@ -145,7 +116,7 @@
                 <script type="text/javascript">
                     var elems = document.getElementsByClassName('confirmReturn');
                     var confirmIt = function (e) {
-                        if (!confirm('Take back asset from agent? This will go back to unassigned assets')) e.preventDefault();
+                        if (!confirm('Take back asset from agent? This will go back to the inventory')) e.preventDefault();
                     };
                     for (var i = 0, l = elems.length; i < l; i++) {
                         elems[i].addEventListener('click', confirmIt, false);
@@ -153,17 +124,6 @@
                 </script>
 
 
-<script>
-    function hideUnhide() {
-      var my_element = document.getElementById('div_flash');
-      if (my_element.style.display === 'none') {
-        my_element.style.display = 'inline';
-      } else {
-        my_element.style.display = 'none';
-      }
-    }
-    </script>
-    
     
 </body>
 </html>

@@ -2,7 +2,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh; /* Set minimum height for full viewport */
+    min-height: 80vh; /* Set minimum height for full viewport */
   }
   
   .error-message,
@@ -45,4 +45,28 @@
     font-weight: bold;
     letter-spacing: 0.025em;
     text-align: center;
+}
+
+.alert {
+  padding: 20px;
+  background-color: rgb(150, 112, 0 );
+  color: white;
+  margin-bottom: 15px;
+}
+
+/* The close button */
+.closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+/* When moving the mouse over the close button */
+.closebtn:hover {
+  color: black;
 }
