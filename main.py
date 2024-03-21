@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify, url_for, send_from_d
 from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from icecream import ic
-from form import LoginForm, addAsset, assignAsset, UnassignedAgents, employeeForm, UnassignedAgents
+from form import LoginForm, addAsset, assignAsset, UnassignedAgents, employeeForm
 import hashlib
 from models import db, User, Asset, Employee, Stock, ReplaceNo
 from sqlalchemy import cast, text
@@ -128,8 +128,6 @@ def getUser(fullname):
 
     form = UnassignedAgents()
 
-    form = UnassignedAgents()
-
     if fullname:
 
         resolved_emp_details = db.session.query(
@@ -201,9 +199,6 @@ def getUser(fullname):
                 
             
             return render_template("view_user.html", emp_details=emp_details, form=form, fullname=fullname)
-                ic(emp_details)
-
-            return render_template("view_user.html", emp_details=emp_details, form=form)
         else:
             no_assets_flag = True
             error = f"No asset yet assigned to agent {fullname}"
@@ -612,7 +607,7 @@ def login():
         ic(is_user_exists)
         if is_user_exists:
             login_user(is_user_exists, remember=True)
-            return redirect(url_for("home"))
+            return redirect(url_for("view"))
 
         else:
 
