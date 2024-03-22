@@ -45,17 +45,18 @@
 
     
 
-    <form method="POST" action="{{ url_for('update_emp') }}">
+    <form method="POST" action="{{ url_for('update_emp_controller') }}">
         {{ form.csrf_token}}
 
-    
+    {{ form.id(type='hidden')}}
+      
     {{ form.name.label }}
     {{ form.name(size=20) }}
 
     {{ form.role.label }}
     {{ form.role() }}
 
-    <input type="submit" value="Add Agent">
+    <input type="submit" value="Update details">
     </form>
           
 </body>

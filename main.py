@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, jsonify, url_for, send_from_directory, abort, redirect, flash, Blueprint
-from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
+from flask import Flask, render_template, request, jsonify, url_for, redirect, flash
+from flask_login import login_user, LoginManager, login_required, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from icecream import ic
 from form import LoginForm, addAsset, assignAsset, UnassignedAgents, employeeForm
@@ -670,9 +670,12 @@ def confirm_delete_emp(fn):
         flash(f"Employee with ID {bye_emp.id} not found.")
 
     return redirect(url_for('view_emp'))
+
+
 ### FIX PROBLEM
-app.route("/update-emp/<fn>", methods=['GET', 'POST'])
-def update_emp(fn):
+@app.route("/update-emp/<fn>", methods=['GET', 'POST'])
+@login_required
+def name_emp_update(fn):
 
     form = employeeForm()
 
@@ -685,15 +688,37 @@ def update_emp(fn):
 
         return redirect(url_for('view_emp'))
 
-    form.name = getEmp.full_name
+    form.id.data = getEmp.id
+    form.name.data = getEmp.full_name
+
+    return render_template('update_emp.html', form=form)
+
+@app.route('/update-emp-controller', methods=['POST'])
+@login_required
+def update_emp_controller():
 
     if request.method == 'POST':
 
-        return "Alex"
-    
-    return render_template('update_emp.html', form=form)
+        id = request.form.get('id')
+        full_name = request.form.get('name')
+        role = request.form.get('role')
 
+        empObject = Employee.query.filter_by(id=id).first()
 
+        if empObject:
+
+            empObject.full_name = full_name
+            empObject.role = role
+            
+            db.session.commit()
+            
+            msg = "Employee details update succesfully."
+        else:
+            msg = "Employee not found! please try again later."
+        
+        flash(msg)
+        
+    return redirect(url_for('view_emp'))
 
 @app.route("/")
 def index():

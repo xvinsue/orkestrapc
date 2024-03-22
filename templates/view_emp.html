@@ -49,7 +49,7 @@
           
         <div class="search-bar">
           <input type="text" class="form-control" id="myInput" onkeyup="myFunction()" placeholder="Search by name...">
-          <a href="{{ url_for('add_emp') }}" class="btn btn-primary">Click Me!</a>
+          <a href="{{ url_for('add_emp') }}" class="btn btn-primary">Add employee</a>
 
         </div>
         <table class="table" id="myTable">
@@ -68,7 +68,7 @@
               <td>{{ emp.full_name }}</td>
               <td>{{ emp.role }}</td>
               <td>
-                <a href="{{ url_for('update_emp', fn2=emp.full_name) }}"><i class="fa-solid fa-pen"></i>
+                <a href="{{ url_for('name_emp_update', fn=emp.full_name) }}"><i class="fa-solid fa-pen"></i>
                 </a>
                 <a href="{{ url_for('confirm_delete_emp', fn=emp.full_name) }}" class="confirmation"><i class="fa-solid fa-trash"></i>
                 </a>
