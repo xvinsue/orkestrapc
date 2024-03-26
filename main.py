@@ -607,7 +607,7 @@ def login():
         ic(is_user_exists)
         if is_user_exists:
             login_user(is_user_exists, remember=True)
-            return redirect(url_for("view"))
+            return redirect(url_for("home"))
 
         else:
 
