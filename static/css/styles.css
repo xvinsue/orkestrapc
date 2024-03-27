@@ -585,8 +585,152 @@ form h1{
 }
 
 /* Asset View */
+.mainAsset{
+    display: grid;
+  grid-template-columns: auto auto auto auto;
+}
 .assignAsset{
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
+    color: white;
+    text-align: center;
+}
+.assignAsset h1{
+    padding: 10px;
+}
+.assignAsset table{
+    width: 1000px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: #F6921E;
+    border-collapse: collapse;
+}
+.assignSearch input{
+    align-items: center;
+    font-size: 20px;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+.assignATable th{
+    border: #F6921E;
+}
+.assignAgent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    height: 30vh;
+    color: white;
+}
+.assignAgent input{
+    padding: 10px;
+    border-radius: 10px;
+}
+.assignAgent select{
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* REPLACE ASSET */
+.replaceAsset{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+    text-align: center;
+}
+.replaceAsset h1{
+    padding: 10px;
+}
+.replaceAsset table{
+    width: 1000px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: #F6921E;
+    border-collapse: collapse;
+}
+.replaceSearch input{
+    align-items: center;
+    font-size: 20px;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+}
+.assignATable th{
+    border: #F6921E;
+}
+.replaceAgent {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 10px;
+    height: 30vh;
+    color: white;
+}
+.replaceAgent input{
+    padding: 10px;
+    border-radius: 10px;
+}
+.replaceAgent select{
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* UPDATE ASSET */
+.updateAsset{
+    margin: auto;
+    margin-top: 70px;
+    background: #F6921E;
+    width: 20%;
+    height: 50%;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
+.updateAsset form{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2E2E2E;
+    flex-direction: column;
+}
+.updateAsset label{
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+.addAsset input{
+    padding: 8px 15px;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+.updateAsset select{
+    padding: 8px 15px;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+.updateAsset .buttonAdd{
+    margin-top: 10px;
+}
+.updateAsset p{
+    padding: 10px;
+    background-color: black;
+    color: #F6921E;
+    width: 60%;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    border-radius: 10px;
 }

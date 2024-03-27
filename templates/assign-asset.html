@@ -19,11 +19,11 @@
         </ul>   
     </div>
     </nav>
-</header>
+  </header>
     <div class="assignAsset">
       <form method="POST" action="{{ url_for('assign_asset') }}">
         {{ form.csrf_token}}
-        <div class="input-wrapper">
+        <div class="assignTAssets">
           {{ form.name.label }}
           {{ form.name(size=20) }}
   

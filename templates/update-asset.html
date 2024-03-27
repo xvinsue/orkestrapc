@@ -14,7 +14,7 @@
 <body>
     <header>
         <nav>
-         <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
+         <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='assets/orkestra-main-logo.png') }}" alt=""></a>
          <div class="nav-links">
             <ul>
                 <li><a href="{{ url_for('home') }}">Home</a></li>
@@ -25,29 +25,32 @@
         </div>
         </nav>
     </header>
-    <form method="POST" action="{{ url_for('asset_update', num=num) }}">  
-        {{ form.csrf_token }}
-
-        {{ form.name.label }}
-        {{ form.name(size=20, value=asset.name) }}  
-
-        {{ form.category.label }}
-        {{ form.category() }}   
-
-        {{ form.asset_tag.label }}
-        {{ form.asset_tag(size=20, value=asset.asset_tag) }}  
-        
-        {{ form.serial_no.label }}
-        {{ form.serial_no(size=20, value=asset.serial_number) }} 
-         <input type="submit" value="Update">
-      </form>
-      
+    <div class="updateAsset">
+        <form method="POST" action="{{ url_for('asset_update', num=num) }}">  
+            {{ form.csrf_token }}
+    
+            {{ form.name.label }}
+            {{ form.name(size=20, value=asset.name) }}  
+    
+            {{ form.category.label }}
+            {{ form.category() }}   
+    
+            {{ form.asset_tag.label }}
+            {{ form.asset_tag(size=20, value=asset.asset_tag) }}  
+            
+            {{ form.serial_no.label }}
+            {{ form.serial_no(size=20, value=asset.serial_number) }} 
+             <input type="submit" value="Update">
+          </form>
           
-    {% if error %}
-
-    <p style="color:red;">{{ error }}</p>
-
-    {% endif %}
+              
+        {% if error %}
+    
+        <p style="color:red;">{{ error }}</p>
+    
+        {% endif %}
+    </div>
+    
 
 </body>
 
