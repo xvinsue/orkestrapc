@@ -48,6 +48,3 @@ class ReplaceNo(db.Model):
 
 def create_database():
     db.create_all()
-
-
-

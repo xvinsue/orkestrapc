@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, jsonify, url_for, send_from_directory, abort, redirect, flash, Blueprint
-from flask_login import UserMixin, login_user, LoginManager, login_required, current_user, logout_user
+from flask import Flask, render_template, request, jsonify, url_for, redirect, flash
+from flask_login import login_user, LoginManager, login_required, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from icecream import ic
 from form import LoginForm, addAsset, assignAsset, UnassignedAgents, employeeForm
@@ -635,14 +635,90 @@ def add_emp():
         msg = "New user added succesfully!"
         flash(msg)
 
-
-
     return render_template('add-emp.html', form=form)
 
 @app.route("/view-emp", methods=['GET', 'POST'])
 def view_emp():
 
-    return "alex"
+    employee = Employee.query.all()
+
+    if not employee:
+
+        msg = "No employee found!"
+        flash(msg)
+
+    return render_template("view_emp.html", employee=employee)
+
+@app.route('/confirm_delete_emp/<fn>', methods=['GET', 'POST'])
+def confirm_delete_emp(fn):
+    bye_emp = Employee.query.filter_by(full_name=fn).first()
+    if bye_emp:
+        # Delete associated entries (consider alternatives to .all())
+        delete_replace_entry = ReplaceNo.query.filter_by(employee_id=bye_emp.id).delete()
+        delete_asset_entry = Asset.query.filter_by(employee_id=bye_emp.id).delete()
+
+        db.session.delete(bye_emp)
+        db.session.commit()
+
+        # Update db1 and db2 variables based on actual deletions
+        db1 = "ReplaceNo" if delete_replace_entry else ""
+        db2 = "Asset" if delete_asset_entry else ""
+
+        msg = f"Agent {bye_emp.full_name} succesfully removed from tables {db1}, {db2}."
+        flash(msg)
+    else:
+        flash(f"Employee with ID {bye_emp.id} not found.")
+
+    return redirect(url_for('view_emp'))
+
+
+### FIX PROBLEM
+@app.route("/update-emp/<fn>", methods=['GET', 'POST'])
+@login_required
+def name_emp_update(fn):
+
+    form = employeeForm()
+
+    getEmp = Employee.query.filter_by(full_name=fn).first()
+
+    if not getEmp:
+
+        msg = "Employee not found, please try again!"
+        flash(msg)
+
+        return redirect(url_for('view_emp'))
+
+    form.id.data = getEmp.id
+    form.name.data = getEmp.full_name
+
+    return render_template('update_emp.html', form=form)
+
+@app.route('/update-emp-controller', methods=['POST'])
+@login_required
+def update_emp_controller():
+
+    if request.method == 'POST':
+
+        id = request.form.get('id')
+        full_name = request.form.get('name')
+        role = request.form.get('role')
+
+        empObject = Employee.query.filter_by(id=id).first()
+
+        if empObject:
+
+            empObject.full_name = full_name
+            empObject.role = role
+            
+            db.session.commit()
+            
+            msg = "Employee details update succesfully."
+        else:
+            msg = "Employee not found! please try again later."
+        
+        flash(msg)
+        
+    return redirect(url_for('view_emp'))
 
 @app.route("/")
 def index():

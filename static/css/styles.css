@@ -583,3 +583,10 @@ form h1{
     font-weight: bold;
     border-radius: 10px;
 }
+
+/* Asset View */
+.assignAsset{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

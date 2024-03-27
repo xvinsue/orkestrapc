@@ -27,7 +27,8 @@ class UnassignedAgents(FlaskForm):
 
 
 class employeeForm(FlaskForm):
-
+    
+    id = IntegerField(label="id", validators=[DataRequired()])
     name = StringField(label="Agent full name", validators=[DataRequired(), Length(min=5)])
     role = SelectField(label='Category', choices=['MSE', 'SA', 'FSE', 'HR', 'Recruit', 'Intern'])
 
@@ -38,4 +39,3 @@ class employeeForm(FlaskForm):
             if char in excluded_chars:
                 raise ValidationError(
                     f"Character {char} is not allowed in full name.")
-
