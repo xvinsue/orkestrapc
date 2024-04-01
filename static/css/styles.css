@@ -447,7 +447,6 @@ form h1{
     font-weight: bold;
     font-size: 15px;
     text-align: center;
-    margin: auto;
     background: #F6921E;
     border-radius: 20px;
     height: 240px;
@@ -468,7 +467,7 @@ form h1{
     justify-content: center;
     align-items: center;
     text-align: center;
-    margin: auto;
+    margin-top: 30px;
     background: #F6921E;
     border-radius: 20px;
     height: 100px;
@@ -490,12 +489,12 @@ form h1{
     font-weight: bold;
     font-size: 15px;
     text-align: center;
-    margin: auto;
     background: #F6921E;
     border-radius: 20px;
-    height: 260px;
+    height: 200px;
     width: 100%;
     box-shadow: 0 .4rem .8rem #0005;
+    margin-bottom: 50px;
 }
 .viewAgent label{
     margin-bottom: 30px;
@@ -710,7 +709,7 @@ form h1{
     padding-bottom: 10px;
     padding-top: 10px;
 }
-.addAsset input{
+.updateAsset input{
     padding: 8px 15px;
     border: 1px solid black;
     border-radius: 10px;
@@ -732,5 +731,107 @@ form h1{
     margin-top: 10px;
     margin-bottom: 10px;
     font-weight: bold;
+    border-radius: 10px;
+}
+
+/* VIEW EMPLOYEE */
+
+.viewEmployee{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    color: white;
+}
+.viewEmployee h1{
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+.viewEmpS{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.viewEmpS label{
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+.viewEmpS input{
+    padding: 8px 15px;
+    border: 1px solid black;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+.viewEmpS a{
+    padding: 8px 15px;
+    border: 1px solid black;
+    border-radius: 10px;
+    background-color: #F6921E;
+    margin-bottom: 30px;
+    text-decoration: none;
+    color: #191919;
+}
+.viewEmpT table{
+    margin: auto;
+    color: white;
+    border-collapse: collapse;
+    text-align: center;
+    width: 1500px;
+}
+.viewEmpT thead{
+    font-size: 15px;
+    border: 1px solid #F6921E;
+    background-color: #191919;
+}
+.viewEmpT th{
+    padding: 20px;
+    border: 1px solid #F6921E;
+}
+.viewEmpT a{
+    text-decoration: none;
+    color: white;
+}
+.viewEmpT tbody{
+    font-size: 15px;
+    border: transparent;
+}
+
+/* ADD EMPLOYEE */
+.addEmp{
+    margin: auto;
+    margin-top: 70px;
+    background: #F6921E;
+    width: 20%;
+    height: 50%;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
+.addEmp form{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2E2E2E;
+    flex-direction: column;
+}
+.addEmp label{
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+.addEmp input{
+    padding: 8px 15px;
+    border: 1px solid black;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+.addEmp select{
+    padding: 8px 15px;
+    border: 1px solid black;
     border-radius: 10px;
 }
