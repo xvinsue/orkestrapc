@@ -835,3 +835,54 @@ form h1{
     border: 1px solid black;
     border-radius: 10px;
 }
+
+/* UPDATE EMPLOYEE */
+.updateEmp{
+    margin: auto;
+    margin-top: 70px;
+    background: #F6921E;
+    width: 20%;
+    height: 50%;
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+}
+.updateEmp form{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2E2E2E;
+    flex-direction: column;
+}
+.updateEmp label{
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+.updateEmp input{
+    padding: 8px 15px;
+    border: 1px solid black;
+    border-radius: 10px;
+}
+.updateEmp select{
+    padding: 8px 15px;
+    border: 1px solid black;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+.updateEmp .buttonAdd{
+    margin-top: 10px;
+}
+.updateEmp p{
+    padding: 10px;
+    background-color: black;
+    color: #F6921E;
+    width: 60%;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    border-radius: 10px;
+}
