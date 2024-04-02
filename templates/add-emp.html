@@ -2,10 +2,11 @@
 <html lang="en">
 
 <head>
-    <title>Add or Remove Input Fields Dynamically</title>
+    <title>Orkestra PC</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link rel="stylesheet" href="static\css\styles.css">
+    <link rel="stylesheet" href="static\css\alert.css">
 </head>
 
 <body>
@@ -15,35 +16,36 @@
      <div class="nav-links">
         <ul>
             <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('view') }}">Agents</a></li>
+            <li><a href="{{ url_for('view') }}">Assigned Assets</a></li>
             <li><a href="{{ url_for('asset_view') }}">Peripherals</a></li>
+            <li><a href="{{ url_for('view_emp') }}">Employee</a></li>
             <li><a href="{{ url_for('login') }}">Logout</a></li>
         </ul>   
     </div>
     </nav>
 </header>
 
-  <div class="addEmp">
-    {% with messages = get_flashed_messages() %}
-    {% if messages or form.errors %}
-      <div class="alert">
-        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-        {% if messages %}
-          {{ messages[0] }}  {% else %}  <ul>  {% for field, errors in form.errors.items() %}
-              <li>  {{ field }}:  {% for error in errors %}
-                  {{ error }}<br>  {% endfor %}
-              </li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-      </div>
+{% with messages = get_flashed_messages() %}
+{% if messages or form.errors %}
+  <div class="alert">
+    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+    {% if messages %}
+      {{ messages[0] }}  {% else %}  <ul>  {% for field, errors in form.errors.items() %}
+          <li>  {{ field }}:  {% for error in errors %}
+              {{ error }}<br>  {% endfor %}
+          </li>
+        {% endfor %}
+      </ul>
     {% endif %}
-    {% endwith %}
+  </div>
+{% endif %}
+{% endwith %}
+
+  <div class="addEmp">
 
     <form method="POST" action="{{ url_for('add_emp') }}">
-        {{ form.csrf_token}}
+    {{ form.csrf_token}}
 
-    
     {{ form.name.label }}
     {{ form.name(size=20) }}
 

@@ -39,3 +39,17 @@ class employeeForm(FlaskForm):
             if char in excluded_chars:
                 raise ValidationError(
                     f"Character {char} is not allowed in full name.")
+            
+
+class employeeForm2(FlaskForm):
+    
+    name = StringField(label="Agent full name", validators=[DataRequired(), Length(min=5)])
+    role = SelectField(label='Category', choices=['MSE', 'SA', 'FSE', 'HR', 'Recruit', 'Intern'])
+
+
+    def validate_name(form, field):
+        excluded_chars = "*?!'^+%&/()=}][{$#123456789"
+        for char in field.data:
+            if char in excluded_chars:
+                raise ValidationError(
+                    f"Character {char} is not allowed in full name.")

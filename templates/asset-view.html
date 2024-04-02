@@ -13,10 +13,11 @@
      <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
      <div class="nav-links">
         <ul>
-            <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('view') }}">Agents</a></li>
-            <li><a href="{{ url_for('asset_view') }}">Peripherals</a></li>
-            <li><a href="{{ url_for('login') }}">Logout</a></li>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('view') }}">Assigned Assets</a></li>
+          <li><a href="{{ url_for('asset_view') }}">Peripherals</a></li>
+          <li><a href="{{ url_for('view_emp') }}">Employee</a></li>
+          <li><a href="{{ url_for('login') }}">Logout</a></li>
         </ul>   
     </div>
     </nav>
@@ -25,7 +26,7 @@
       <div class="assetHeader">
         <h1>Unassigned Assets</h1>
         {% if msg %}
-          <div class="alert alert-warning alert-dismissible fade show" role="alert">
+          <div class="alert alert-primary alert-dismissible fade show" role="alert">
             <strong>{{ msg }} </strong> 
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
               <span aria-hidden="true">&times;</span>
@@ -36,7 +37,7 @@
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             <ul class=flashes>
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
                     <strong> {{ messages[0] }}</strong> 
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -127,8 +128,7 @@ function myFunction() {
     }
 </script>
 
-
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
       
 
 </body>

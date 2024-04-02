@@ -5,6 +5,8 @@
   <title>Add Employee</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
   <script src="https://kit.fontawesome.com/b5d820a994.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="static\css\alert.css">
+
 
 </head>
 <body>
@@ -13,46 +15,44 @@
      <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
      <div class="nav-links">
         <ul>
-            <li><a href="{{ url_for('home') }}">Home</a></li>
-            <li><a href="{{ url_for('view') }}">Agents</a></li>
-            <li><a href="{{ url_for('asset_view') }}">Peripherals</a></li>
-            <li><a href="{{ url_for('login') }}">Logout</a></li>
+          <li><a href="{{ url_for('home') }}">Home</a></li>
+          <li><a href="{{ url_for('view') }}">Assigned Assets</a></li>
+          <li><a href="{{ url_for('asset_view') }}">Peripherals</a></li>
+          <li><a href="{{ url_for('view_emp') }}">Employee</a></li>
+          <li><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>   
     </div>
     </nav>
 </header>
-    <div class="viewEmployee">
-        <h1>Assign Asset to Agent Form</h1>
-        {% if msg %}
+
+{% if msg %}
      
 
-          <div class="alert alert-warning alert-dismissible fade show" role="alert">
-            <strong>{{ msg }} </strong> 
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
+<div class="alert" style="border-radius: 5px;">
+ <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+  <strong>{{ msg }}</strong> 
+</div>
 
-          {% elif request.args.get('msg') %}
+{% elif request.args.get('msg') %}
 
-            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-              <strong>{{ request.args.get('msg') }} </strong> 
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-          {% endif %}
+  <div class="alert" style="border-radius: 5px;">
+  <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+    <strong>{{ request.args.get('msg') }} </strong> 
+  </div>
+{% endif %}
 
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            <ul class=flashes>
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <strong> {{ messages[0] }}</strong> 
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                  </div>
-            </ul>
-          {% endif %}
-        {% endwith %}
-
-          
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+  <ul class=flashes>
+      <div class="alert" style="border-radius: 5px;">
+          <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+          <strong> {{ messages[0] }}</strong> 
+        </div>
+  </ul>
+{% endif %}
+{% endwith %}
+    <div class="viewEmployee">
+        <h1>Assign Asset to Agent Form</h1>    
         <div class="viewEmpS">
           <input type="text" class="form-control" id="myInput" onkeyup="myFunction()" placeholder="Search by name...">
           <a href="{{ url_for('add_emp') }}" class="btn btn-primary"><strong>Add employee</strong></a>
@@ -76,6 +76,7 @@
                 <td>{{ emp.role }}</td>
                 <td>
                   <a href="{{ url_for('name_emp_update', fn=emp.full_name) }}"><i class="fa-solid fa-pen"></i>
+                    &nbsp;
                   </a>
                   <a href="{{ url_for('confirm_delete_emp', fn=emp.full_name) }}" class="confirmation"><i class="fa-solid fa-trash"></i>
                   </a>

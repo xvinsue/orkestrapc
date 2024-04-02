@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Add or Remove Input Fields Dynamically</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/view_user.css') }}">
+
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            margin-top: 1%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #rowAdder {
+            margin-left: 17px;
+        }
+    </style>
+</head>
+
+<body>
+
+    
+    {% with messages = get_flashed_messages() %}
+    {% if messages or form.errors %}
+      <div class="alert">
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+        {% if messages %}
+          {{ messages[0] }}  {% else %}  <ul>  {% for field, errors in form.errors.items() %}
+              <li>  {{ field }}:  {% for error in errors %}
+                  {{ error }}<br>  {% endfor %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    {% endif %}
+    {% endwith %}
+    
+
+    
+
+    <form method="POST" action="{{ url_for('update_emp_controller') }}">
+        {{ form.csrf_token}}
+
+    {{ form.id(type='hidden')}}
+      
+    {{ form.name.label }}
+    {{ form.name(size=20) }}
+
+    {{ form.role.label }}
+    {{ form.role() }}
+
+    <input type="submit" value="Update details">
+    </form>
+          
+</body>
+
+</html>

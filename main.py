@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify, url_for, redirect, f
 from flask_login import login_user, LoginManager, login_required, logout_user
 from flask_sqlalchemy import SQLAlchemy
 from icecream import ic
-from form import LoginForm, addAsset, assignAsset, UnassignedAgents, employeeForm
+from form import LoginForm, addAsset, assignAsset, UnassignedAgents, employeeForm, employeeForm2
 import hashlib
 from models import db, User, Asset, Employee, Stock, ReplaceNo
 from sqlalchemy import cast, text
@@ -273,6 +273,7 @@ def view():
 # ----------------------- CRUD FOR ASSET ONLY ----------------------------
 
 @app.route("/add-asset", methods=['POST', 'GET'])
+@login_required
 def add_asset_form():
 
     form = addAsset()
@@ -284,10 +285,7 @@ def add_asset_form():
         asset_tag = request.form.get('asset_tag')
         serial_no = request.form.get('serial_no')
 
-        is_exist = Stock.query.filter(
-            (Stock.asset_tag == asset_tag) | (asset_tag is None)
-        ).first()
-
+        is_exist = Stock.query.filter_by(name=name, category=category, asset_tag=asset_tag).first()
         
         if not is_exist:
 
@@ -304,6 +302,7 @@ def add_asset_form():
     return render_template('add-asset.html', form=form, error=error)
 
 @app.route("/asset-view", methods=['GET'])
+@login_required
 def asset_view():
     
     
@@ -314,7 +313,7 @@ def asset_view():
     SELECT stock_id FROM asset
     );
     """
-
+    
     stocks_not_in_asset = db.session.execute(text(all_stocks_query))
 
     if not stocks_not_in_asset:
@@ -620,7 +619,7 @@ def login():
 @app.route('/add-emp', methods=['GET', 'POST'])
 def add_emp():
 
-    form = employeeForm()
+    form = employeeForm2()
 
     
     if form.validate_on_submit():
@@ -628,12 +627,21 @@ def add_emp():
         name = request.form.get('name')
         role = request.form.get('role')
 
-        employeeObj = Employee(full_name=name, role=role)
-        db.session.add(employeeObj)
-        db.session.commit()
+        is_emp_exist = Employee.query.filter_by(full_name=name, role=role).first()
 
-        msg = "New user added succesfully!"
-        flash(msg)
+        if not is_emp_exist:
+
+            employeeObj = Employee(full_name=name, role=role)
+            db.session.add(employeeObj)
+            db.session.commit()
+
+            msg = "New user added succesfully!"
+            flash(msg)
+        else:
+            msg = f"Employee {is_emp_exist.full_name} already exist at department {is_emp_exist.role}"
+            flash(msg)
+
+        return redirect(url_for('add_emp'))
 
     return render_template('add-emp.html', form=form)
 
@@ -672,7 +680,6 @@ def confirm_delete_emp(fn):
     return redirect(url_for('view_emp'))
 
 
-### FIX PROBLEM
 @app.route("/update-emp/<fn>", methods=['GET', 'POST'])
 @login_required
 def name_emp_update(fn):
@@ -690,6 +697,7 @@ def name_emp_update(fn):
 
     form.id.data = getEmp.id
     form.name.data = getEmp.full_name
+    form.role.data = getEmp.role
 
     return render_template('update_emp.html', form=form)
 
