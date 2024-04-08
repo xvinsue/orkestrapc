@@ -590,22 +590,31 @@ form h1{
 }
 .assignAsset{
     display: flex;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
-    color: white;
-    text-align: center;
 }
 .assignAsset h1{
-    padding: 10px;
+    margin: auto;
+    color: white;
+    margin-top: 20px;
 }
 .assignAsset table{
-    width: 1000px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    padding: 10px;
-    border: #F6921E;
+    margin: auto;
+    color: white;
     border-collapse: collapse;
+    text-align: center;
+    width: 1500px;
+}
+.assignAsset thead{
+    font-size: 15px;
+    border: 1px solid #F6921E;
+    background-color: #191919;
+}
+.assignAsset th{
+    padding: 20px;
+}
+.assignAsset tbody{
+    font-size: 15px;
+    border: 1px solid #F6921E;
 }
 .assignSearch input{
     align-items: center;
@@ -614,6 +623,7 @@ form h1{
     margin-top: 10px;
     margin-bottom: 10px;
     border-radius: 10px;
+    margin-left: 820px;
 }
 .assignATable th{
     border: #F6921E;
