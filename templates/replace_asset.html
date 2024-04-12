@@ -44,29 +44,32 @@
         <div class="replaceSearch">
           <input type="text" class="form-control" id="myInput" onkeyup="myFunction()" placeholder="Search by name...">
         </div>
-        <table class="table" id="myTable">
-          <thead>
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Name</th>
-              <th scope="col">Category</th>
-              <th scope="col">Asset Tag</th>
-              <th scope="col">Serial Number</th>
-            </tr>
-          </thead>
-          <tbody style="overflow-y: auto; height: 300px;">
-            {% for stock in stocks %}
-            <tr>
-              <th scope="row">{{ stock.id }}</th>
-              <td>{{ stock.name }}</td>
-              <td>{{ stock.category }}</td>
-              <td>{{ stock.asset_tag }}</td>
-              <td>{{ stock.serial_number }}</td>
-
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        <div class="replaceTable">
+          <table id="myTable">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Name</th>
+                <th scope="col">Category</th>
+                <th scope="col">Asset Tag</th>
+                <th scope="col">Serial Number</th>
+              </tr>
+            </thead>
+            <tbody style="overflow-y: auto; height: 300px;">
+              {% for stock in stocks %}
+              <tr>
+                <th scope="row">{{ stock.id }}</th>
+                <td>{{ stock.name }}</td>
+                <td>{{ stock.category }}</td>
+                <td>{{ stock.asset_tag }}</td>
+                <td>{{ stock.serial_number }}</td>
+  
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        
 
     <div class="replaceAgent">
         <p>Select asset number to be replaced</p>

@@ -652,47 +652,87 @@ form h1{
     align-items: center;
     flex-direction: column;
     color: white;
-    text-align: center;
 }
 .replaceAsset h1{
-    padding: 10px;
+   margin-top: 30px;
+   margin-bottom: 30px;
 }
-.replaceAsset table{
-    width: 1000px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    padding: 10px;
-    border: #F6921E;
-    border-collapse: collapse;
+.replaceSearch{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.replaceSearch label{
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 10px;
+    padding-top: 10px;
 }
 .replaceSearch input{
-    align-items: center;
-    font-size: 20px;
-    padding: 10px;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    padding: 8px 15px;
+    border: 1px solid black;
     border-radius: 10px;
+    margin-bottom: 30px;
 }
-.assignATable th{
-    border: #F6921E;
+.replaceTable table{
+    margin: auto;
+    color: white;
+    border-collapse: collapse;
+    text-align: center;
+    width: 1500px;
 }
-.replaceAgent {
+.replaceTable thead{
+    font-size: 15px;
+    border: 1px solid #F6921E;
+    background-color: #191919;
+}
+.replaceTable th{
+    padding: 20px;
+    border: 1px solid #F6921E;
+}
+.replaceTable a{
+    text-decoration: none;
+    color: white;
+}
+.replaceTable tbody{
+    font-size: 15px;
+    border: transparent;
+}
+.replaceAgent form{
     display: flex;
     align-items: center;
     justify-content: center;
+    color: #2E2E2E;
     flex-direction: column;
-    padding: 10px;
-    height: 30vh;
+}
+.replaceAgent label{
+    font-size: 20px;
+    font-weight: bold;
+    padding-bottom: 10px;
+    padding-top: 10px;
     color: white;
 }
 .replaceAgent input{
-    padding: 10px;
+    padding: 8px 15px;
+    border: 1px solid black;
     border-radius: 10px;
+    background-color: #F6921E;
+    margin-top: 5px;
 }
 .replaceAgent select{
-    padding: 10px;
+    padding: 8px 15px;
+    border: 1px solid black;
     border-radius: 10px;
 }
+.replaceAgent {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 40px;
+}
+
+
+
 
 /* UPDATE ASSET */
 .updateAsset{
