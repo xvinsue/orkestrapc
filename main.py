@@ -614,6 +614,32 @@ def login():
 
     return render_template("login.html", form=form)
 
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+
+    form = LoginForm()
+
+    # if request.method == "POST":
+
+    #     username = request.form.get("username")
+    #     password = request.form.get("password")
+    #     type = request.form.get("user")
+
+    #     hashed = hash_sha256(password)
+
+    #     is_user_exists = User.query.filter_by(
+    #         username=username, password=hashed).first()
+    #     ic(is_user_exists)
+    #     if is_user_exists:
+    #         login_user(is_user_exists, remember=True)
+    #         return redirect(url_for("home"))
+
+    #     else:
+
+    #         return render_template("login.html", form=form, error="Wrong username or password.")
+
+    return render_template("register.html", form=form)
+
 # ---------------- EXPERIMENTAL ---------------------
 # CRUD FOR EMPLOYEE
 @app.route('/add-emp', methods=['GET', 'POST'])

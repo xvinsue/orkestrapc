@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Orkestra Inventory System</title>
+        <link rel="stylesheet" href="static\css\styles.css">
+        <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    </head>
+<body>
+    <header>
+        <nav>
+         <a href="{{ url_for('home') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
+         <div class="nav-links">
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('view') }}">Assigned Assets</a></li>
+                <li><a href="{{ url_for('asset_view') }}">Peripherals</a></li>
+                <li><a href="{{ url_for('view_emp') }}">Employee</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>   
+        </div>
+        </nav>
+    </header>
+    
+    <div class="container">   
+    <div class="wrapper">
+        <form method="POST" action="{{ url_for('register') }}">
+            {{ form.csrf_token }}
+            <a href="{{ url_for('index') }}"><img src="static\css\assets\orkestra-main-logo.png" alt=""></a>
+            <hr>
+            <h1>Add User</h1>
+            <div class="input-box">
+                {{ form.username(size=20, class_='username-box', placeholder="Username") }}
+            </div>
+            <div class="input-box">
+                {{ form.password(size=20, class_='password-box', placeholder="Password") }}
+            </div>
+            <div class="select-dropdown">
+                <div class="select-btn">
+                   <span class="content-text">Select your option</span>
+                   <i class='bx bx-chevron-down'></i>
+                </div>
+                <ul class="content">
+                    <li class="content-option">
+                        <span class="content-text">Guest</span>
+                    </li>
+                    <li class="content-option">
+                        <span class="content-text">Admin</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="input-field">
+                <input type="submit" value="Register" class="input-submit"></input>
+            </div>
+            <hr>    
+            <div class="support">
+                <a href="#">Forgot Password?</a>
+            </div> 
+            {% if error != "" %}
+            <p style="color:red; "> {{ error }} </p>
+            {% endif %}
+            <script src="static\css\script.js"></script>
+        </form>
+    </div>
+</section>
+
+</body>
+</html>

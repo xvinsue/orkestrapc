@@ -108,7 +108,7 @@ nav img{
     align-items: center;
     position: relative;
     padding: 60px 20px 30px 20px;
-    height: 450px;
+    height: 600px;
     width: 400px;
     background-color: rgba(39, 35, 33, 0.5);
     margin-top: 100px;
@@ -179,6 +179,55 @@ form h1{
     text-decoration: none;
     color: white;
 }
+.select-dropdown{
+    width: 250px;
+}
+.select-dropdown.active .content{
+    display: none;
+}
+.select-dropdown .select-btn{
+    display: flex;
+    width: 200px;
+    height: 30px;
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid white;
+    border-radius: 10px;
+    padding: 5px 20px 5px 20px;
+    background: #2E2E2E;
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: 0.4s;
+}
+.select-btn i{
+    font-size: 15px;
+}
+.select-dropdown .content{
+    width: 200px;
+    position: relative;
+    padding: 5px;
+    margin-top: 10px;
+    border-radius: 10px;
+    background: rgba(224, 223, 223, 0.5);
+    box-shadow: 0px 2px 2px #2E2E2E;
+    margin-bottom: 20px;
+}
+.content .content-option{
+    display: flex;
+    height: 30px;
+    cursor: pointer;
+    align-items: center;
+    padding: 10px;
+}
+.content .content-option:hover{
+    background-color: #2E2E2E;
+    color: #fff;
+}
+
+
 
 /* HOME INDEX */
 .card-line{
