@@ -1,2 +1,2 @@
-# orkestrapc
-Inventory System
+# Orkestrapc
+Computer Equipment - Inventory System 
